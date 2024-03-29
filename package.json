@@ -48,6 +48,7 @@
     "url": "https://github.com/xiaoxian521"
   },
   "dependencies": {
+    "plus-pro-components": "^0.0.5",
     "cropperjs": "^1.6.1",
     "@zxcvbn-ts/core": "^3.0.4",
     "@pureadmin/descriptions": "^1.2.1",

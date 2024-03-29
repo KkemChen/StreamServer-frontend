@@ -68,23 +68,23 @@ const {
         :model="form"
         class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
       >
-        <el-form-item label="用户名称：" prop="username">
+        <el-form-item label="CameraName" prop="username">
           <el-input
             v-model="form.username"
-            placeholder="请输入用户名称"
+            placeholder="please input camera name"
             clearable
             class="!w-[180px]"
           />
         </el-form-item>
-        <el-form-item label="手机号码：" prop="phone">
+        <el-form-item label="ID" prop="phone">
           <el-input
             v-model="form.phone"
-            placeholder="请输入手机号码"
+            placeholder="please input id"
             clearable
             class="!w-[180px]"
           />
         </el-form-item>
-        <el-form-item label="状态：" prop="status">
+       <!--  <el-form-item label="状态：" prop="status">
           <el-select
             v-model="form.status"
             placeholder="请选择"
@@ -94,7 +94,7 @@ const {
             <el-option label="已开启" value="1" />
             <el-option label="已关闭" value="0" />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item>
           <el-button
             type="primary"
@@ -121,7 +121,7 @@ const {
             :icon="useRenderIcon(AddFill)"
             @click="openDialog()"
           >
-            新增用户
+            新增
           </el-button>
         </template>
         <template v-slot="{ size, dynamicColumns }">
@@ -176,6 +176,16 @@ const {
                 link
                 type="primary"
                 :size="size"
+                :icon="useRenderIcon(Play)"
+                @click="openDialog('修改', row)"
+              >
+                预览
+              </el-button>
+              <el-button
+                class="reset-margin"
+                link
+                type="primary"
+                :size="size"
                 :icon="useRenderIcon(EditPen)"
                 @click="openDialog('修改', row)"
               >
@@ -197,16 +207,6 @@ const {
                   </el-button>
                 </template>
               </el-popconfirm>
-              <el-button
-                class="reset-margin"
-                link
-                type="primary"
-                :size="size"
-                :icon="useRenderIcon(Play)"
-                @click="openDialog('修改', row)"
-              >
-                预览
-              </el-button>
               <el-button
                 class="reset-margin"
                 link
