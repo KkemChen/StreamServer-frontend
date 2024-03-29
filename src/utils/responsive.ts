@@ -10,7 +10,7 @@ export const injectResponsiveStorage = (app: App, config: PlatformConfigs) => {
     {
       // layout模式以及主题
       layout: Storage.getData("layout", nameSpace) ?? {
-        layout: config.Layout ?? "vertical",
+        layout: config.Layout ?? "horizontal",
         theme: config.Theme ?? "light",
         darkMode: config.DarkMode ?? false,
         sidebarStatus: config.SidebarStatus ?? true,
@@ -22,7 +22,7 @@ export const injectResponsiveStorage = (app: App, config: PlatformConfigs) => {
       configure: Storage.getData("configure", nameSpace) ?? {
         grey: config.Grey ?? false,
         weak: config.Weak ?? false,
-        hideTabs: config.HideTabs ?? false,
+        hideTabs: config.HideTabs ?? true,
         hideFooter: config.HideFooter ?? true,
         showLogo: config.ShowLogo ?? true,
         showModel: config.ShowModel ?? "smart",

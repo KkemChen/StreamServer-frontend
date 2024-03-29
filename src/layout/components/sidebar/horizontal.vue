@@ -61,11 +61,11 @@ nextTick(() => {
       <!-- 菜单搜索 -->
       <Search id="header-search" />
       <!-- 全屏 -->
-      <FullScreen id="full-screen" />
+      <!-- <FullScreen id="full-screen" /> -->
       <!-- 消息通知 -->
-      <Notice id="header-notice" />
+      <!-- <Notice id="header-notice" /> -->
       <!-- 退出登录 -->
-      <el-dropdown trigger="click">
+      <!-- <el-dropdown trigger="click">
         <span class="el-dropdown-link navbar-bg-hover">
           <img :src="userAvatar" :style="avatarsStyle" />
           <p v-if="username" class="dark:text-white">{{ username }}</p>
@@ -81,7 +81,7 @@ nextTick(() => {
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
-      </el-dropdown>
+      </el-dropdown> -->
       <span
         class="set-icon navbar-bg-hover"
         title="打开项目配置"
