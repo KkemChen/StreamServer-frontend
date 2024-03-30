@@ -2,7 +2,7 @@ export default {
   path: "/stream/total",
   meta: {
     icon: "ri:folder-video-fill",
-    title: "Stream",
+    title: "视频流",
     rank: 2,
     showLink: true
   },

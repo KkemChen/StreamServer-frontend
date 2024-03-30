@@ -15,7 +15,191 @@ import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 import Play from "@iconify-icons/ri/play-circle-line";
 import Info from "@iconify-icons/ri/information-line";
+// import Detail from "./detail.vue";
+import "plus-pro-components/es/components/drawer-form/style/css";
+import {
+  type PlusColumn,
+  type FieldValues,
+  PlusDrawerForm
+} from "plus-pro-components";
+const values = ref<FieldValues>({});
+const columnsDetail: PlusColumn[] = [
+  {
+    label: "名称",
+    width: 120,
+    prop: "name",
+    valueType: "copy",
+    tooltip: "名称最多显示6个字符"
+  },
+  {
+    label: "状态",
+    width: 120,
+    prop: "status",
+    valueType: "select",
+    options: [
+      {
+        label: "未解决",
+        value: "0",
+        color: "red"
+      },
+      {
+        label: "已解决",
+        value: "1",
+        color: "blue"
+      },
+      {
+        label: "解决中",
+        value: "2",
+        color: "yellow"
+      },
+      {
+        label: "失败",
+        value: "3",
+        color: "red"
+      }
+    ]
+  },
+  {
+    label: "是否显示",
+    width: 100,
+    prop: "switch",
+    valueType: "switch"
+  },
 
+  {
+    label: "时间",
+    prop: "time",
+    valueType: "date-picker"
+  },
+  {
+    label: "数量",
+    prop: "number",
+    valueType: "input-number",
+    fieldProps: { precision: 2, step: 2 }
+  },
+  {
+    label: "城市",
+    prop: "city",
+    valueType: "cascader",
+    options: [
+      {
+        value: "0",
+        label: "陕西",
+        children: [
+          {
+            value: "0-0",
+            label: "西安",
+            children: [
+              {
+                value: "0-0-0",
+                label: "新城区"
+              },
+              {
+                value: "0-0-1",
+                label: "高新区"
+              },
+              {
+                value: "0-0-2",
+                label: "灞桥区"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        value: "1",
+        label: "山西",
+        children: [
+          {
+            value: "1-0",
+            label: "太原",
+            children: [
+              {
+                value: "1-0-0",
+                label: "小店区"
+              },
+              {
+                value: "1-0-1",
+                label: "古交市"
+              },
+              {
+                value: "1-0-2",
+                label: "万柏林区"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    label: "地区",
+    prop: "place",
+    tooltip: "请精确到门牌号",
+    fieldProps: {
+      placeholder: "请精确到门牌号"
+    }
+  },
+  {
+    label: "要求",
+    prop: "demand",
+    valueType: "checkbox",
+    options: [
+      {
+        label: "四六级",
+        value: "0"
+      },
+      {
+        label: "计算机二级证书",
+        value: "1"
+      },
+      {
+        label: "普通话证书",
+        value: "2"
+      }
+    ]
+  },
+  {
+    label: "梦想",
+    prop: "gift",
+    valueType: "radio",
+    options: [
+      {
+        label: "诗",
+        value: "0"
+      },
+      {
+        label: "远方",
+        value: "1"
+      },
+      {
+        label: "美食",
+        value: "2"
+      }
+    ]
+  },
+  {
+    label: "到期时间",
+    prop: "endTime",
+    valueType: "date-picker",
+    fieldProps: {
+      type: "datetimerange",
+      startPlaceholder: "请选择开始时间",
+      endPlaceholder: "请选择结束时间"
+    }
+  },
+  {
+    label: "说明",
+    prop: "desc",
+    valueType: "textarea",
+    fieldProps: {
+      maxlength: 10,
+      showWordLimit: true,
+      // @ts-expect-error
+      autosize: { minRows: 2, maxRows: 4 }
+    }
+  }
+];
 defineOptions({
   name: "SystemUser"
 });
@@ -50,6 +234,13 @@ const {
   handleCurrentChange,
   handleSelectionChange
 } = useUser(tableRef, treeRef);
+
+let detailVisible = ref(false);
+
+const handleOpenDetail = () => {
+  console.log("click", columnsDetail);
+  detailVisible.value = true;
+};
 </script>
 
 <template>
@@ -84,7 +275,7 @@ const {
             class="!w-[180px]"
           />
         </el-form-item>
-       <!--  <el-form-item label="状态：" prop="status">
+        <!--  <el-form-item label="状态：" prop="status">
           <el-select
             v-model="form.status"
             placeholder="请选择"
@@ -111,7 +302,7 @@ const {
       </el-form>
 
       <PureTableBar
-        title="用户管理（仅演示，操作后不生效）"
+        title="ivss_stream_info"
         :columns="columns"
         @refresh="onSearch"
       >
@@ -213,10 +404,11 @@ const {
                 type="primary"
                 :size="size"
                 :icon="useRenderIcon(Info)"
-                @click="openDialog('修改', row)"
+                @click="handleOpenDetail()"
               >
                 详情
               </el-button>
+
               <!-- <el-dropdown>
                 <el-button
                   class="ml-3 mt-[2px]"
@@ -273,6 +465,13 @@ const {
       </PureTableBar>
     </div>
   </div>
+  <!-- <div>
+    <PlusDrawerForm
+      v-model:visible="detailVisible"
+      v-model="values"
+      :form="{ columnsDetail }"
+    />
+  </div> -->
 </template>
 
 <style scoped lang="scss">
@@ -294,3 +493,4 @@ const {
   }
 }
 </style>
+./index.vue

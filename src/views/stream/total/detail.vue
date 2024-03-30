@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 // https://plus-pro-components.com/components/drawer-form.html
 import "plus-pro-components/es/components/drawer-form/style/css";
 import {
@@ -7,6 +7,8 @@ import {
   type FieldValues,
   PlusDrawerForm
 } from "plus-pro-components";
+import { watch } from "fs";
+import { log } from "console";
 
 const columns: PlusColumn[] = [
   {
@@ -186,21 +188,33 @@ const columns: PlusColumn[] = [
   }
 ];
 
-const visible = ref(false);
+const props = defineProps<{
+  visible:Boolean
+}>()
+
+// const visible = ref(true);
 const values = ref<FieldValues>({});
 
+let visible = ref(props.visible)
+
+watchEffect(() => {
+  visible.value = props.visible
+  console.log(`p: `,props.visible,visible.value)
+})
+// const visible = ref(true)
 const handleOpen = () => {
-  visible.value = true;
+  // props.visible = true;
 };
+
+
+
+
 </script>
 
 <template>
   <div>
-    <el-button @click="handleOpen">打开抽屉表单</el-button>
-    <PlusDrawerForm
-      v-model:visible="visible"
-      v-model="values"
-      :form="{ columns }"
-    />
+    <!-- <el-button @click="handleOpen">打开抽屉表单</el-button> -->
+    <PlusDrawerForm 
+    v-model:visible="visible" v-model="values" :form="{ columns }" />
   </div>
 </template>

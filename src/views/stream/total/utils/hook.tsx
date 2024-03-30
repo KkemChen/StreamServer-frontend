@@ -11,6 +11,20 @@ import { usePublicHooks } from "../../hooks";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
 import type { FormItemProps, RoleFormItemProps } from "../utils/types";
+
+import hikvisionImage from "@/assets/vendor/海康.png";
+import dahuaImage from "@/assets/vendor/大华.png";
+import univiewImage from "@/assets/vendor/宇视.png";
+import tdyImage from "@/assets/vendor/天地伟业.png";
+import otherImage from "@/assets/vendor/其他.png";
+const vendorImages = {
+  1: { image: hikvisionImage, name: "海康" },
+  2: { image: dahuaImage, name: "大华" },
+  3: { image: univiewImage, name: "宇视" },
+  4: { image: tdyImage, name: "天地伟业" },
+  5: { image: otherImage, name: "其他" }
+};
+
 import {
   getKeyList,
   isAllEmpty,
@@ -76,7 +90,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       reserveSelection: true // 数据刷新后保留选项
     },
     {
-      label: "CameraName",
+      label: "视频流名称",
       prop: "cameraName",
       minWidth: 130
     },
@@ -86,7 +100,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       width: 130
     },
     {
-      label: "IP",
+      label: "IP地址",
       prop: "ip",
       minWidth: 130
     },
@@ -108,21 +122,30 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     //   )
     // },
     {
-      label: "DevType",
-      prop: "devType",
+      label: "设备厂商", //1.海康 2.大华 3.宇视 4.天地伟业
+      prop: "vendor",
+      minWidth: 130,
+      align: "left",
       cellRenderer: ({ row }) => (
-        <el-image
-          fit="cover"
-          preview-teleported={true}
-          src={row.avatar || userAvatar}
-          preview-src-list={Array.of(row.avatar || userAvatar)}
-          class="w-[24px] h-[24px] rounded-full align-middle"
-        />
-      ),
-      width: 90
+        <div>
+          <el-image
+            fit="cover"
+            preview-teleported={true}
+            src={row.vendor ? vendorImages[row.vendor].image : otherImage}
+            preview-src-list={Array.of(
+              row.vendor ? vendorImages[row.vendor].image : otherImage
+            )}
+            class="w-[22px] h-[22px] rounded-full align-middle"
+          />
+          <span>
+            &nbsp;&nbsp;
+            {row.vendor ? vendorImages[row.vendor].name : "未知"}
+          </span>
+        </div>
+      )
     },
     {
-      label: "StreamMode",
+      label: "取流模式",
       prop: "streamMode",
       minWidth: 90,
       cellRenderer: ({ row, props }) => {
@@ -149,7 +172,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       }
     },
     {
-      label: "Status",
+      label: "状态",
       prop: "status",
       minWidth: 90,
       cellRenderer: scope => (
@@ -182,7 +205,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     //     dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
     // },
     {
-      label: "operation",
+      label: "操作",
       fixed: "right",
       width: 300,
       slot: "operation"
