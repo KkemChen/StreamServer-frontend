@@ -51,170 +51,40 @@ const columns: PlusColumn[] = [
     width: 100,
     prop: "switch",
     valueType: "switch"
-  },
-
-  {
-    label: "时间",
-    prop: "time",
-    valueType: "date-picker"
-  },
-  {
-    label: "数量",
-    prop: "number",
-    valueType: "input-number",
-    fieldProps: { precision: 2, step: 2 }
-  },
-  {
-    label: "城市",
-    prop: "city",
-    valueType: "cascader",
-    options: [
-      {
-        value: "0",
-        label: "陕西",
-        children: [
-          {
-            value: "0-0",
-            label: "西安",
-            children: [
-              {
-                value: "0-0-0",
-                label: "新城区"
-              },
-              {
-                value: "0-0-1",
-                label: "高新区"
-              },
-              {
-                value: "0-0-2",
-                label: "灞桥区"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        value: "1",
-        label: "山西",
-        children: [
-          {
-            value: "1-0",
-            label: "太原",
-            children: [
-              {
-                value: "1-0-0",
-                label: "小店区"
-              },
-              {
-                value: "1-0-1",
-                label: "古交市"
-              },
-              {
-                value: "1-0-2",
-                label: "万柏林区"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    label: "地区",
-    prop: "place",
-    tooltip: "请精确到门牌号",
-    fieldProps: {
-      placeholder: "请精确到门牌号"
-    }
-  },
-  {
-    label: "要求",
-    prop: "demand",
-    valueType: "checkbox",
-    options: [
-      {
-        label: "四六级",
-        value: "0"
-      },
-      {
-        label: "计算机二级证书",
-        value: "1"
-      },
-      {
-        label: "普通话证书",
-        value: "2"
-      }
-    ]
-  },
-  {
-    label: "梦想",
-    prop: "gift",
-    valueType: "radio",
-    options: [
-      {
-        label: "诗",
-        value: "0"
-      },
-      {
-        label: "远方",
-        value: "1"
-      },
-      {
-        label: "美食",
-        value: "2"
-      }
-    ]
-  },
-  {
-    label: "到期时间",
-    prop: "endTime",
-    valueType: "date-picker",
-    fieldProps: {
-      type: "datetimerange",
-      startPlaceholder: "请选择开始时间",
-      endPlaceholder: "请选择结束时间"
-    }
-  },
-  {
-    label: "说明",
-    prop: "desc",
-    valueType: "textarea",
-    fieldProps: {
-      maxlength: 10,
-      showWordLimit: true,
-      // @ts-expect-error
-      autosize: { minRows: 2, maxRows: 4 }
-    }
   }
 ];
 
 const props = defineProps<{
-  visible:Boolean
-}>()
+  visible: boolean;
+}>();
 
 // const visible = ref(true);
 const values = ref<FieldValues>({});
 
-let visible = ref(props.visible)
+let visible = ref(props.visible);
 
 watchEffect(() => {
-  visible.value = props.visible
-  console.log(`p: `,props.visible,visible.value)
-})
+  visible.value = props.visible;
+  console.log(`p: `, props.visible, visible.value);
+});
 // const visible = ref(true)
 const handleOpen = () => {
   // props.visible = true;
 };
-
-
-
-
 </script>
 
 <template>
   <div>
     <!-- <el-button @click="handleOpen">打开抽屉表单</el-button> -->
-    <PlusDrawerForm 
-    v-model:visible="visible" v-model="values" :form="{ columns }" />
+    <!-- <PlusDrawerForm
+      v-model:visible="props.visible"
+      v-model="values"
+      :form="{ columns }"
+    /> -->
+
+
+
+
+    
   </div>
 </template>

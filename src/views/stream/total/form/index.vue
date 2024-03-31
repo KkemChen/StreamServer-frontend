@@ -4,20 +4,21 @@ import ReCol from "@/components/ReCol";
 import { formRules } from "../utils/rule";
 import { FormProps } from "../utils/types";
 import { usePublicHooks } from "../../hooks";
+import JsonView from "../json/index.vue";
 
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
-    title: "新增",
-    higherDeptOptions: [],
-    parentId: 0,
-    nickname: "",
-    username: "",
-    password: "",
-    phone: "",
-    email: "",
-    sex: "",
-    status: 1,
-    remark: ""
+     id: "",
+  /** 用于判断是`新增`还是`修改` */
+  title: "",
+  higherDeptOptions: [],
+  cameraName: "",
+  streamMode: 0,
+  devType: 0,
+  ip: "",
+  url: "",
+  status: 0,
+  remark: "",
   })
 });
 
@@ -163,13 +164,14 @@ defineExpose({ getRef });
       </re-col>
 
       <re-col>
-        <el-form-item label="备注">
+        <JsonView/>
+        <!-- <el-form-item label="备注">
           <el-input
             v-model="newFormInline.remark"
             placeholder="请输入备注信息"
             type="textarea"
           />
-        </el-form-item>
+        </el-form-item> -->
       </re-col>
     </el-row>
   </el-form>

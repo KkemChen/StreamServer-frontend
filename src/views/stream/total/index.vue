@@ -15,191 +15,8 @@ import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 import Play from "@iconify-icons/ri/play-circle-line";
 import Info from "@iconify-icons/ri/information-line";
-// import Detail from "./detail.vue";
-import "plus-pro-components/es/components/drawer-form/style/css";
-import {
-  type PlusColumn,
-  type FieldValues,
-  PlusDrawerForm
-} from "plus-pro-components";
-const values = ref<FieldValues>({});
-const columnsDetail: PlusColumn[] = [
-  {
-    label: "名称",
-    width: 120,
-    prop: "name",
-    valueType: "copy",
-    tooltip: "名称最多显示6个字符"
-  },
-  {
-    label: "状态",
-    width: 120,
-    prop: "status",
-    valueType: "select",
-    options: [
-      {
-        label: "未解决",
-        value: "0",
-        color: "red"
-      },
-      {
-        label: "已解决",
-        value: "1",
-        color: "blue"
-      },
-      {
-        label: "解决中",
-        value: "2",
-        color: "yellow"
-      },
-      {
-        label: "失败",
-        value: "3",
-        color: "red"
-      }
-    ]
-  },
-  {
-    label: "是否显示",
-    width: 100,
-    prop: "switch",
-    valueType: "switch"
-  },
+import Detail from "./detail.vue";
 
-  {
-    label: "时间",
-    prop: "time",
-    valueType: "date-picker"
-  },
-  {
-    label: "数量",
-    prop: "number",
-    valueType: "input-number",
-    fieldProps: { precision: 2, step: 2 }
-  },
-  {
-    label: "城市",
-    prop: "city",
-    valueType: "cascader",
-    options: [
-      {
-        value: "0",
-        label: "陕西",
-        children: [
-          {
-            value: "0-0",
-            label: "西安",
-            children: [
-              {
-                value: "0-0-0",
-                label: "新城区"
-              },
-              {
-                value: "0-0-1",
-                label: "高新区"
-              },
-              {
-                value: "0-0-2",
-                label: "灞桥区"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        value: "1",
-        label: "山西",
-        children: [
-          {
-            value: "1-0",
-            label: "太原",
-            children: [
-              {
-                value: "1-0-0",
-                label: "小店区"
-              },
-              {
-                value: "1-0-1",
-                label: "古交市"
-              },
-              {
-                value: "1-0-2",
-                label: "万柏林区"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    label: "地区",
-    prop: "place",
-    tooltip: "请精确到门牌号",
-    fieldProps: {
-      placeholder: "请精确到门牌号"
-    }
-  },
-  {
-    label: "要求",
-    prop: "demand",
-    valueType: "checkbox",
-    options: [
-      {
-        label: "四六级",
-        value: "0"
-      },
-      {
-        label: "计算机二级证书",
-        value: "1"
-      },
-      {
-        label: "普通话证书",
-        value: "2"
-      }
-    ]
-  },
-  {
-    label: "梦想",
-    prop: "gift",
-    valueType: "radio",
-    options: [
-      {
-        label: "诗",
-        value: "0"
-      },
-      {
-        label: "远方",
-        value: "1"
-      },
-      {
-        label: "美食",
-        value: "2"
-      }
-    ]
-  },
-  {
-    label: "到期时间",
-    prop: "endTime",
-    valueType: "date-picker",
-    fieldProps: {
-      type: "datetimerange",
-      startPlaceholder: "请选择开始时间",
-      endPlaceholder: "请选择结束时间"
-    }
-  },
-  {
-    label: "说明",
-    prop: "desc",
-    valueType: "textarea",
-    fieldProps: {
-      maxlength: 10,
-      showWordLimit: true,
-      // @ts-expect-error
-      autosize: { minRows: 2, maxRows: 4 }
-    }
-  }
-];
 defineOptions({
   name: "SystemUser"
 });
@@ -238,9 +55,36 @@ const {
 let detailVisible = ref(false);
 
 const handleOpenDetail = () => {
-  console.log("click", columnsDetail);
+  // console.log("click", columnsDetail);
   detailVisible.value = true;
 };
+
+const detailInfo = ref([
+  {
+    label: "名称",
+    value: "admin"
+  },
+  {
+    label: "ID",
+    value: "202403271719201001"
+  },
+  {
+    label: "IP",
+    value: "127.0.0.1"
+  },
+  {
+    label: "URL",
+    value: "RTSP://127.0.0.1/LIVE/TESTSTSTSGSSGSG.LIVE.FLV"
+  }
+]);
+
+/* const detailInfo = ref(
+  {
+    name: "test",
+    id: "123456789",
+    url: "rtsp://xxxxxxxxxxxxxxxxxxx/live",
+  }
+) */
 </script>
 
 <template>
@@ -464,14 +308,28 @@ const handleOpenDetail = () => {
         </template>
       </PureTableBar>
     </div>
+    <!-- <Detail :visible="detailVisible" /> -->
+    <el-drawer v-model="detailVisible" title="I'm outer Drawer" size="50%">
+      <div>
+        <el-descriptions :column="1" class="h-systemInfo" border>
+          <el-descriptions-item
+            v-for="item in detailInfo"
+            class-name="system-content"
+          >
+            <template #label label-align="center">
+              <span class="system-label">
+                {{ item.label }}
+              </span>
+            </template>
+            {{ item.value }}
+          </el-descriptions-item>
+        </el-descriptions>
+        <!-- 1.名称 2. id 3.ip 4.厂商 5.模式 6. 取流url 7. 转发url 4行 8.创建时间 9.
+        更新时间 -->
+      </div>
+    </el-drawer>
+    
   </div>
-  <!-- <div>
-    <PlusDrawerForm
-      v-model:visible="detailVisible"
-      v-model="values"
-      :form="{ columnsDetail }"
-    />
-  </div> -->
 </template>
 
 <style scoped lang="scss">
@@ -491,6 +349,28 @@ const handleOpenDetail = () => {
   :deep(.el-form-item) {
     margin-bottom: 12px;
   }
+}
+.h-systemInfo {
+  margin-left: 18px;
+  height: 216px;
+}
+@-moz-document url-prefix() {
+  .h-systemInfo {
+    height: auto;
+  }
+}
+
+.system-label {
+  font-weight: 400 !important;
+  font-size: 14px !important;
+  color: #1f2329;
+  // text-align: right;
+  // display: inline-block; /* 使宽度设置生效 */
+  // width: 50px; /* 例如，设定一个固定的宽度 */
+}
+
+.system-content {
+  font-size: 14px !important;
 }
 </style>
 ./index.vue
