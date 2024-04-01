@@ -3,9 +3,9 @@ interface FormItemProps {
   /** 用于判断是`新增`还是`修改` */
   title: string;
   higherDeptOptions: Record<string, unknown>[];
-  cameraName: string;
+  name: string;
   streamMode: number;
-  devType: number;
+  vendor: number;
   ip: string;
   url: string;
   status: number;

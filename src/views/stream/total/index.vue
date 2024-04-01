@@ -103,7 +103,7 @@ const detailInfo = ref([
         :model="form"
         class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
       >
-        <el-form-item label="CameraName" prop="username">
+        <el-form-item label="名称" prop="username">
           <el-input
             v-model="form.username"
             placeholder="please input camera name"
@@ -229,6 +229,7 @@ const detailInfo = ref([
               <el-popconfirm
                 :title="`是否确认删除用户编号为${row.id}的这条数据`"
                 @confirm="handleDelete(row)"
+                :width="200"
               >
                 <template #reference>
                   <el-button
@@ -309,7 +310,10 @@ const detailInfo = ref([
       </PureTableBar>
     </div>
     <!-- <Detail :visible="detailVisible" /> -->
-    <el-drawer v-model="detailVisible" title="I'm outer Drawer" size="50%">
+    <el-drawer v-model="detailVisible" title="详情" size="50%">
+      <template #header>
+        <h3>详情</h3>
+      </template>
       <div>
         <el-descriptions :column="1" class="h-systemInfo" border>
           <el-descriptions-item
@@ -328,7 +332,6 @@ const detailInfo = ref([
         更新时间 -->
       </div>
     </el-drawer>
-    
   </div>
 </template>
 

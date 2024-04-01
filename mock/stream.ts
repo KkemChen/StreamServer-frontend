@@ -9,13 +9,13 @@ export default defineFakeRoute([
     response: ({ body }) => {
       let list = [
         {
-          cameraName: "admin",
-          id: "202403271719201001",
+          name: "admin",
+          id: "202403271719201001M",
           ip: "127.0.0.1",
           url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
           email: faker.internet.email(),
           streamMode: 0,
-          vendor: "1",
+          vendor: 1,
           sex: 0,
           status: 1,
           remark: "管理员",
@@ -23,12 +23,12 @@ export default defineFakeRoute([
           updateTime: 1605456000000
         },
         {
-          cameraName: "admin2",
+          name: "admin2",
           id: "202403271719201002",
           ip: "192.168.1.1",
           url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
           email: faker.internet.email(),
-          vendor: "2",
+          vendor: 2,
           streamMode: 1,
           sex: 0,
           status: 1,
@@ -37,12 +37,12 @@ export default defineFakeRoute([
           updateTime: 1605456000000
         },
         {
-          cameraName: "test1",
+          name: "test1",
           id: "202403271719201009",
           ip: "127.0.0.1",
           url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
           email: faker.internet.email(),
-          vendor: "3",
+          vendor: 3,
           streamMode: 2,
           sex: 0,
           status: 1,
@@ -51,12 +51,12 @@ export default defineFakeRoute([
           updateTime: 1605456000000
         },
         {
-          cameraName: "test2",
+          name: "test2",
           id: "202403271719201008",
           ip: "127.0.0.1",
           url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
           email: faker.internet.email(),
-          vendor: "4",
+          vendor: 4,
           streamMode: 3,
           sex: 0,
           status: 1,
@@ -65,12 +65,12 @@ export default defineFakeRoute([
           updateTime: 1605456000000
         },
         {
-          cameraName: "test6",
+          name: "test6",
           id: "202403271719201008",
           ip: "127.0.0.1",
           url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
           email: faker.internet.email(),
-          vendor: "5",
+          vendor: 5,
           streamMode: 4,
           sex: 0,
           status: 1,
@@ -79,7 +79,7 @@ export default defineFakeRoute([
           updateTime: 1605456000000
         }
       ];
-      // list = list.filter(item => item.cameraName.includes(body?.cameraName));
+      // list = list.filter(item => item.name.includes(body?.name));
       // list = list.filter(item =>
       //   String(item.status).includes(String(body?.status))
       // );

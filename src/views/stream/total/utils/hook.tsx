@@ -12,17 +12,17 @@ import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
 import type { FormItemProps, RoleFormItemProps } from "../utils/types";
 
-import hikvisionImage from "@/assets/vendor/海康.png";
-import dahuaImage from "@/assets/vendor/大华.png";
-import univiewImage from "@/assets/vendor/宇视.png";
-import tdyImage from "@/assets/vendor/天地伟业.png";
-import otherImage from "@/assets/vendor/其他.png";
+import hikvisionImage from "@/assets/vendor/hikvision.png";
+import dahuaImage from "@/assets/vendor/dahua.png";
+import univiewImage from "@/assets/vendor/uniview.png";
+import tdyImage from "@/assets/vendor/tiandy.png";
+import otherImage from "@/assets/vendor/other.png";
 const vendorImages = {
+  0: { image: otherImage, name: "其他" },
   1: { image: hikvisionImage, name: "海康" },
   2: { image: dahuaImage, name: "大华" },
   3: { image: univiewImage, name: "宇视" },
-  4: { image: tdyImage, name: "天地伟业" },
-  5: { image: otherImage, name: "其他" }
+  4: { image: tdyImage, name: "天地伟业" }
 };
 
 import {
@@ -90,8 +90,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       reserveSelection: true // 数据刷新后保留选项
     },
     {
-      label: "视频流名称",
-      prop: "cameraName",
+      label: "名称",
+      prop: "name",
       minWidth: 130
     },
     {
@@ -125,21 +125,29 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       label: "设备厂商", //1.海康 2.大华 3.宇视 4.天地伟业
       prop: "vendor",
       minWidth: 130,
-      align: "left",
+      // align: "left",
       cellRenderer: ({ row }) => (
         <div>
           <el-image
             fit="cover"
             preview-teleported={true}
-            src={row.vendor ? vendorImages[row.vendor].image : otherImage}
+            src={
+              row.vendor && vendorImages[row.vendor]
+                ? vendorImages[row.vendor].image
+                : vendorImages[0].image
+            }
             preview-src-list={Array.of(
-              row.vendor ? vendorImages[row.vendor].image : otherImage
+              row.vendor && vendorImages[row.vendor]
+                ? vendorImages[row.vendor].image
+                : vendorImages[0].image
             )}
             class="w-[22px] h-[22px] rounded-full align-middle"
           />
           <span>
             &nbsp;&nbsp;
-            {row.vendor ? vendorImages[row.vendor].name : "未知"}
+            {row.vendor && vendorImages[row.vendor]
+              ? vendorImages[row.vendor].name
+              : vendorImages[0].name}
           </span>
         </div>
       )
@@ -147,7 +155,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "取流模式",
       prop: "streamMode",
-      minWidth: 90,
+      minWidth: 130,
       cellRenderer: ({ row, props }) => {
         let tagType = null;
         let mode = "DirectProxy";
@@ -365,15 +373,15 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         formInline: {
           title,
           higherDeptOptions: formatHigherDeptOptions(higherDeptOptions.value),
-          parentId: row?.dept.id ?? 0,
-          nickname: row?.nickname ?? "",
-          username: row?.username ?? "",
-          password: row?.password ?? "",
-          phone: row?.phone ?? "",
-          email: row?.email ?? "",
-          sex: row?.sex ?? "",
-          status: row?.status ?? 1,
-          remark: row?.remark ?? ""
+          id: row?.id ?? 0,
+          /** 用于判断是`新增`还是`修改` */
+          name: row?.name,
+          streamMode: row?.streamMode,
+          vendor: row?.vendor,
+          ip: row?.ip,
+          url: row?.url,
+          status: row?.status,
+          remark: row?.remark
         }
       },
       width: "46%",
@@ -386,7 +394,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
         function chores() {
-          message(`您${title}了用户名称为${curData.username}的这条数据`, {
+          message(`您${title}了用户名称为${curData.id}的这条数据`, {
             type: "success"
           });
           done(); // 关闭弹框

@@ -49,7 +49,7 @@ import "tippy.js/dist/tippy.css";
 import "tippy.js/themes/light.css";
 import VueTippy from "vue-tippy";
 app.use(VueTippy);
-import PrimeVue from "primevue/config"; //PrimeVue
+// import PrimeVue from "primevue/config"; //PrimeVue
 
 
 getPlatformConfig(app).then(async config => {
@@ -57,7 +57,7 @@ getPlatformConfig(app).then(async config => {
   app.use(router);
   await router.isReady();
   injectResponsiveStorage(app, config);
-  app.use(MotionPlugin).use(useElementPlus).use(Table).use(PrimeVue);
+  app.use(MotionPlugin).use(useElementPlus).use(Table);
   // .use(PureDescriptions)
   // .use(useEcharts);
   app.mount("#app");
