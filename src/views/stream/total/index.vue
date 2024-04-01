@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, watch, nextTick } from "vue";
 import tree from "./tree.vue";
 import { useUser } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
@@ -112,16 +112,43 @@ const detailInfo = ref([
 ]);
 const playDialogVisible = ref(false);
 
-// const dp = new DPlayer({
-//   container: document.getElementById("dplayer"),
-//   video: {
-//     url: "http://192.168.1.82:8096/live/66.live.mp4"
-//   }
-// });
+let dp = null;
+
+watch(playDialogVisible, newVal => {
+  if (newVal) {
+    nextTick().then(() => {
+      // 对话框显示，初始化DPlayer
+      dp = new DPlayer({
+        container: document.getElementById("dplayer"),
+        autoplay: true,
+        preload: "auto",
+        video: {
+          url: "http://47.243.129.22:8096/live/test3.live.mp4",
+          type: "auto"
+        }
+      });
+    });
+  } else {
+    // 对话框隐藏，销毁DPlayer实例
+    if (dp) {
+      dp.destroy(); // 销毁DPlayer实例
+      dp = null; // 重置dp变量
+    }
+  }
+});
 
 const play = (id: String) => {
   playDialogVisible.value = true;
 };
+
+// onMounted(() => {
+//   const dp = new DPlayer({
+//     container: document.getElementById("dplayer"),
+//     video: {
+//       url: "demo.mp4"
+//     }
+//   });
+// });
 </script>
 
 <template>
@@ -368,7 +395,12 @@ const play = (id: String) => {
       </div>
     </el-drawer>
 
-    <el-dialog v-model="playDialogVisible" title="Tips" width="50%">
+    <el-dialog
+      id="player-dialog"
+      v-model="playDialogVisible"
+      :show-close="false"
+      title=""
+    >
       <div id="dplayer"></div>
     </el-dialog>
   </div>
@@ -413,6 +445,19 @@ const play = (id: String) => {
 
 .system-content {
   font-size: 14px !important;
+}
+
+:deep(#player-dialog) {
+  max-width: 50%;
+  width: 45%;
+  padding: 0;
+  .el-dialog__header {
+    padding: 0;
+  }
+  // #player {
+  //   max-width: 100%;
+  //   width: 100%;
+  // }
 }
 </style>
 ./index.vue
