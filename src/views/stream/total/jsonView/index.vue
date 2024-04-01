@@ -8,29 +8,88 @@ defineOptions({
 });
 
 const defaultData = {
-  status: 200,
-  text: "",
-  error: null,
-  config: undefined,
-  data: [
+  msg: "set_stream_source_info",
+  video_source_info: [
     {
-      news_id: 51184,
-      title: "iPhone X Review: Innovative future with real black technology",
-      source: "Netease phone"
+      urlorfile: "rtsp://192.168.1.82/live/66",
+      vendor: 1,
+      ip: "192.168.1.66",
+      camera_id: "test",
+      name: "测试",
+      dev_type: 1,
+      stream_mode: 0
     },
     {
-      news_id: 51183,
-      title:
-        "Traffic paradise: How to design streets for people and unmanned vehicles in the future?",
-      source: "Netease smart",
-      link: "http://netease.smart/traffic-paradise/1235"
+      urlorfile: "rtsp://192.168.1.82/live/66",
+      vendor: 1,
+      ip: "192.168.1.66",
+      camera_id: "test",
+      name: "测试",
+      dev_type: 1,
+      stream_mode: 0
     },
     {
-      news_id: 51182,
-      title:
-        "Teslamask's American Business Relations: The government does not pay billions to build factories",
-      source: "AI Finance",
-      members: ["Daniel", "Mike", "John"]
+      urlorfile: "rtsp://192.168.1.82/live/66",
+      vendor: 1,
+      ip: "192.168.1.66",
+      camera_id: "test",
+      name: "测试",
+      dev_type: 1,
+      stream_mode: 0
+    },
+    {
+      urlorfile: "rtsp://192.168.1.82/live/66",
+      vendor: 1,
+      ip: "192.168.1.66",
+      camera_id: "test",
+      name: "测试",
+      dev_type: 1,
+      stream_mode: 0
+    },
+    {
+      urlorfile: "rtsp://192.168.1.82/live/66",
+      vendor: 1,
+      ip: "192.168.1.66",
+      camera_id: "test",
+      name: "测试",
+      dev_type: 1,
+      stream_mode: 0
+    },
+    {
+      urlorfile: "rtsp://192.168.1.82/live/66",
+      vendor: 1,
+      ip: "192.168.1.66",
+      camera_id: "test",
+      name: "测试",
+      dev_type: 1,
+      stream_mode: 0
+    },
+    {
+      urlorfile: "rtsp://192.168.1.82/live/66",
+      vendor: 1,
+      ip: "192.168.1.66",
+      camera_id: "test",
+      name: "测试",
+      dev_type: 1,
+      stream_mode: 0
+    },
+    {
+      urlorfile: "rtsp://192.168.1.82/live/66",
+      vendor: 1,
+      ip: "192.168.1.66",
+      camera_id: "test",
+      name: "测试",
+      dev_type: 1,
+      stream_mode: 0
+    },
+    {
+      urlorfile: "rtsp://192.168.1.82/live/66",
+      vendor: 1,
+      ip: "192.168.1.66",
+      camera_id: "test",
+      name: "测试",
+      dev_type: 1,
+      stream_mode: 0
     }
   ]
 };
@@ -72,7 +131,7 @@ watch(
 </script>
 
 <template>
-  <el-card shadow="never">
+  <el-card shadow="never" class="json-pretty-card">
     <vue-json-pretty
       v-model:data="state.data"
       :deep="state.deep"
@@ -86,3 +145,12 @@ watch(
     />
   </el-card>
 </template>
+
+<style scope>
+.json-pretty-card {
+  max-height: 300px; /* 设置你希望的最大高度 */
+  overflow-y: auto; /* 当内容超出高度时显示滚动条 */
+  margin-bottom: 10px;
+  margin-left: 10px;
+}
+</style>

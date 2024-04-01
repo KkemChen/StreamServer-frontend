@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import tree from "./tree.vue";
 import { useUser } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
@@ -15,7 +15,8 @@ import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 import Play from "@iconify-icons/ri/play-circle-line";
 import Info from "@iconify-icons/ri/information-line";
-import Detail from "./detail.vue";
+
+import DPlayer from "dplayer";
 
 defineOptions({
   name: "SystemUser"
@@ -73,18 +74,54 @@ const detailInfo = ref([
     value: "127.0.0.1"
   },
   {
-    label: "URL",
-    value: "RTSP://127.0.0.1/LIVE/TESTSTSTSGSSGSG.LIVE.FLV"
+    label: "取流模式",
+    value: "DirectProxy"
+  },
+  {
+    label: "url",
+    value: "rtsp://127.0.0.1/live/test.live.flv"
+  },
+  {
+    label: "创建时间",
+    value: "2024-03-29 00:06:00"
+  },
+  {
+    label: "更新时间",
+    value: "2024-03-29 00:06:00"
+  },
+  {
+    label: "rtsp",
+    value: "rtsp://127.0.0.1:554/live/test"
+  },
+  {
+    label: "rtmp",
+    value: "rtmp://127.0.0.1:2935/live/test"
+  },
+  {
+    label: "http-flv",
+    value: "http://127.0.0.1:8096/live/test.live.flv"
+  },
+  {
+    label: "http-fmp4",
+    value: "http://127.0.0.1:8096/live/test.live.mp4"
+  },
+  {
+    label: "hls",
+    value: "http://127.0.0.1:8096/live/test/hls.m3u8"
   }
 ]);
+const playDialogVisible = ref(false);
 
-/* const detailInfo = ref(
-  {
-    name: "test",
-    id: "123456789",
-    url: "rtsp://xxxxxxxxxxxxxxxxxxx/live",
-  }
-) */
+// const dp = new DPlayer({
+//   container: document.getElementById("dplayer"),
+//   video: {
+//     url: "http://192.168.1.82:8096/live/66.live.mp4"
+//   }
+// });
+
+const play = (id: String) => {
+  playDialogVisible.value = true;
+};
 </script>
 
 <template>
@@ -212,7 +249,7 @@ const detailInfo = ref([
                 type="primary"
                 :size="size"
                 :icon="useRenderIcon(Play)"
-                @click="openDialog('修改', row)"
+                @click="play(row.id)"
               >
                 预览
               </el-button>
@@ -328,10 +365,12 @@ const detailInfo = ref([
             {{ item.value }}
           </el-descriptions-item>
         </el-descriptions>
-        <!-- 1.名称 2. id 3.ip 4.厂商 5.模式 6. 取流url 7. 转发url 4行 8.创建时间 9.
-        更新时间 -->
       </div>
     </el-drawer>
+
+    <el-dialog v-model="playDialogVisible" title="Tips" width="50%">
+      <div id="dplayer"></div>
+    </el-dialog>
   </div>
 </template>
 

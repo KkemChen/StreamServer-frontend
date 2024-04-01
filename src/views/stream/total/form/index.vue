@@ -8,9 +8,9 @@ import JsonView from "../jsonView/index.vue";
 
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
-    id: "",
     /** 用于判断是`新增`还是`修改` */
     title: "",
+    id: " ",
     higherDeptOptions: [],
     name: "",
     streamMode: 0,
@@ -68,17 +68,6 @@ function getRef() {
   return ruleFormRef.value;
 }
 
-const getLabel = vendorValue => {
-  const option = vendorOptions.find(option => option.value === vendorValue);
-  if (option) {
-    return option.label;
-  } else {
-    // 如果未找到，找value为0的项的label
-    const defaultOption = vendorOptions.find(option => option.value === 0);
-    return defaultOption ? defaultOption.label : "未知"; // 如果连value为0的项都没有，返回'未知'
-  }
-};
-
 defineExpose({ getRef });
 </script>
 
@@ -106,7 +95,7 @@ defineExpose({ getRef });
           <el-input
             v-model="newFormInline.name"
             clearable
-            placeholder="请输入视频流昵称"
+            placeholder="请输入视频流名称"
           />
         </el-form-item>
       </re-col>
@@ -164,75 +153,8 @@ defineExpose({ getRef });
           />
         </el-form-item>
       </re-col>
-      <!-- <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="用户性别">
-          <el-select
-            v-model="newFormInline.sex"
-            placeholder="请选择用户性别"
-            class="w-full"
-            clearable
-          >
-            <el-option
-              v-for="(item, index) in sexOptions"
-              :key="index"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-      </re-col> -->
-
-      <!-- <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="归属部门">
-          <el-cascader
-            v-model="newFormInline.parentId"
-            class="w-full"
-            :options="newFormInline.higherDeptOptions"
-            :props="{
-              value: 'id',
-              label: 'name',
-              emitPath: false,
-              checkStrictly: true
-            }"
-            clearable
-            filterable
-            placeholder="请选择归属部门"
-          >
-            <template #default="{ node, data }">
-              <span>{{ data.name }}</span>
-              <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
-            </template>
-          </el-cascader>
-        </el-form-item>
-      </re-col>
-      <re-col
-        v-if="newFormInline.title === '新增'"
-        :value="12"
-        :xs="24"
-        :sm="24"
-      >
-        <el-form-item label="用户状态">
-          <el-switch
-            v-model="newFormInline.status"
-            inline-prompt
-            :active-value="1"
-            :inactive-value="0"
-            active-text="启用"
-            inactive-text="停用"
-            :style="switchStyle"
-          />
-        </el-form-item>
-      </re-col> -->
-
       <re-col>
         <JsonView />
-        <!-- <el-form-item label="备注">
-          <el-input
-            v-model="newFormInline.remark"
-            placeholder="请输入备注信息"
-            type="textarea"
-          />
-        </el-form-item> -->
       </re-col>
     </el-row>
   </el-form>

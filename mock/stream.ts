@@ -77,20 +77,117 @@ export default defineFakeRoute([
           remark: "管理员",
           createTime: 1605456000000,
           updateTime: 1605456000000
+        },
+        {
+          name: "test2",
+          id: "202403271719201008",
+          ip: "127.0.0.1",
+          url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
+          email: faker.internet.email(),
+          vendor: 4,
+          streamMode: 3,
+          sex: 0,
+          status: 1,
+          remark: "管理员",
+          createTime: 1605456000000,
+          updateTime: 1605456000000
+        },
+        {
+          name: "test2",
+          id: "202403271719201008",
+          ip: "127.0.0.1",
+          url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
+          email: faker.internet.email(),
+          vendor: 4,
+          streamMode: 3,
+          sex: 0,
+          status: 1,
+          remark: "管理员",
+          createTime: 1605456000000,
+          updateTime: 1605456000000
+        },
+        {
+          name: "test2",
+          id: "202403271719201008",
+          ip: "127.0.0.1",
+          url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
+          email: faker.internet.email(),
+          vendor: 4,
+          streamMode: 3,
+          sex: 0,
+          status: 1,
+          remark: "管理员",
+          createTime: 1605456000000,
+          updateTime: 1605456000000
+        },
+        {
+          name: "test2",
+          id: "202403271719201008",
+          ip: "127.0.0.1",
+          url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
+          email: faker.internet.email(),
+          vendor: 4,
+          streamMode: 3,
+          sex: 0,
+          status: 1,
+          remark: "管理员",
+          createTime: 1605456000000,
+          updateTime: 1605456000000
+        },
+        {
+          name: "test2",
+          id: "202403271719201008",
+          ip: "127.0.0.1",
+          url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
+          email: faker.internet.email(),
+          vendor: 4,
+          streamMode: 3,
+          sex: 0,
+          status: 1,
+          remark: "管理员",
+          createTime: 1605456000000,
+          updateTime: 1605456000000
+        },
+        {
+          name: "test2",
+          id: "202403271719201008",
+          ip: "127.0.0.1",
+          url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
+          email: faker.internet.email(),
+          vendor: 4,
+          streamMode: 3,
+          sex: 0,
+          status: 1,
+          remark: "管理员",
+          createTime: 1605456000000,
+          updateTime: 1605456000000
+        },
+        {
+          name: "test2",
+          id: "202403271719201008",
+          ip: "127.0.0.1",
+          url: "rtsp://admin:Admin123@192.168.1.241:554/Streaming/Channels/102",
+          email: faker.internet.email(),
+          vendor: 4,
+          streamMode: 3,
+          sex: 0,
+          status: 1,
+          remark: "管理员",
+          createTime: 1605456000000,
+          updateTime: 1605456000000
         }
       ];
-      // list = list.filter(item => item.name.includes(body?.name));
+      if (body.name) list = list.filter(item => item.id.includes(body?.id));
       // list = list.filter(item =>
       //   String(item.status).includes(String(body?.status))
       // );
-      // if (body.phone) list = list.filter(item => item.phone === body.phone);
-      // if (body.deptId) list = list.filter(item => item.dept.id === body.deptId);
+      if (body.name) list = list.filter(item => item.name === body.name);
       return {
         success: true,
         data: {
           list,
           total: list.length, // 总条目数
-          pageSize: 10, // 每页显示条目个数
+          pageSize: 20, // 每页显示条目个数
           currentPage: 1 // 当前页数
         }
       };

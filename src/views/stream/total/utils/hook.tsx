@@ -17,6 +17,10 @@ import dahuaImage from "@/assets/vendor/dahua.png";
 import univiewImage from "@/assets/vendor/uniview.png";
 import tdyImage from "@/assets/vendor/tiandy.png";
 import otherImage from "@/assets/vendor/other.png";
+import Tag from "primevue/tag";
+import UserIcon from "@iconify-icons/ri/user-3-line";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+
 const vendorImages = {
   0: { image: otherImage, name: "其他" },
   1: { image: hikvisionImage, name: "海康" },
@@ -173,9 +177,16 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
             mode = "DirectProxy";
         }
         return (
-          <el-tag size={props.size} type={tagType} effect="dark" round>
+          <el-tag
+            size={props.size}
+            type={tagType}
+            effect="dark"
+            style="font-weight: 700;"
+            round
+          >
             {mode}
           </el-tag>
+          // // <Tag severity="secondary" value={mode}></Tag>
         );
       }
     },
@@ -183,20 +194,25 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       label: "状态",
       prop: "status",
       minWidth: 90,
-      cellRenderer: scope => (
-        <el-switch
-          size={scope.props.size === "small" ? "small" : "default"}
-          loading={switchLoadMap.value[scope.index]?.loading}
-          v-model={scope.row.status}
-          active-value={1}
-          inactive-value={0}
-          active-text="已启用"
-          inactive-text="已停用"
-          inline-prompt
-          style={switchStyle.value}
-          onChange={() => onChange(scope as any)}
-        />
-      )
+      cellRenderer: scope => {
+        const icon = useRenderIcon("ri:search-line");
+        return (
+          <Tag severity="Primary" rounded style="height:1.5rem">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="1em"
+              height="1em"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="currentColor"
+                d="M20 22h-2v-2a3 3 0 0 0-3-3H9a3 3 0 0 0-3 3v2H4v-2a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5zm-8-9a6 6 0 1 1 0-12a6 6 0 0 1 0 12m0-2a4 4 0 1 0 0-8a4 4 0 0 0 0 8"
+              />
+            </svg>
+            <span>&nbsp;6</span>
+          </Tag>
+        );
+      }
     },
     // {
     //   label: "CreateTime",
