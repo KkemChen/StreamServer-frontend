@@ -14,9 +14,11 @@ import NProgress from "../progress";
 import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
 
+console.log(import.meta.env);
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
   // 请求超时时间
+  baseURL: import.meta.env.VITE_APP_BASE_URL,
   timeout: 10000,
   headers: {
     Accept: "application/json, text/plain, */*",
