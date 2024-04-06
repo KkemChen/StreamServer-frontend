@@ -16,6 +16,8 @@ import AddFill from "@iconify-icons/ri/add-circle-line";
 import Play from "@iconify-icons/ri/play-circle-line";
 import Info from "@iconify-icons/ri/information-line";
 
+// import flvjs from "flv.js";
+import mpegts from "mpegts.js";
 import DPlayer from "dplayer";
 
 defineOptions({
@@ -111,9 +113,9 @@ const detailInfo = ref([
   }
 ]);
 const playDialogVisible = ref(false);
-
+const videoUrl = ref("");
 let dp = null;
-
+let flvPlayer = null;
 watch(playDialogVisible, newVal => {
   if (newVal) {
     nextTick().then(() => {
@@ -123,8 +125,19 @@ watch(playDialogVisible, newVal => {
         autoplay: true,
         preload: "auto",
         video: {
-          url: "http://47.243.129.22:8096/live/test3.live.mp4",
-          type: "auto"
+          url: videoUrl.value,
+          type: "customFlv",
+          customType: {
+            customFlv: function (video, player) {
+              flvPlayer = mpegts.createPlayer({
+                type: "flv",
+                url: video.src,
+                isLive: true
+              });
+              flvPlayer.attachMediaElement(video);
+              flvPlayer.load();
+            }
+          }
         }
       });
     });
@@ -133,11 +146,16 @@ watch(playDialogVisible, newVal => {
     if (dp) {
       dp.destroy(); // 销毁DPlayer实例
       dp = null; // 重置dp变量
+      if (flvPlayer) {
+        flvPlayer.destroy();
+        flvPlayer = null;
+      }
     }
   }
 });
 
 const play = (id: String) => {
+  videoUrl.value = `http://127.0.0.1:8096/live/${id}.live.flv`;
   playDialogVisible.value = true;
 };
 
