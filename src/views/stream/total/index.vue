@@ -155,7 +155,7 @@ watch(playDialogVisible, newVal => {
 });
 
 const play = (id: String) => {
-  videoUrl.value = `http://127.0.0.1:8096/live/${id}.live.flv`;
+  videoUrl.value = `http://${import.meta.env.VITE_APP_BASE_IP ? import.meta.env.VITE_APP_BASE_IP : window.location.hostname}:8096/live/${id}.live.flv`;
   playDialogVisible.value = true;
 };
 

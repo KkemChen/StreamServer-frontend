@@ -18,7 +18,7 @@ console.log(import.meta.env);
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
   // 请求超时时间
-  baseURL: import.meta.env.VITE_APP_BASE_URL,
+  baseURL: `http://${import.meta.env.VITE_APP_BASE_IP ? import.meta.env.VITE_APP_BASE_IP : window.location.hostname}:8088/`,
   timeout: 10000,
   headers: {
     Accept: "application/json, text/plain, */*",
