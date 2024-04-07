@@ -30,6 +30,8 @@ const tableRef = ref();
 
 const {
   form,
+  detailVisible,
+  detailInfo,
   loading,
   columns,
   dataList,
@@ -52,66 +54,10 @@ const {
   handleSizeChange,
   onSelectionCancel,
   handleCurrentChange,
-  handleSelectionChange
+  handleSelectionChange,
+  handleOpenDetail
 } = useUser(tableRef, treeRef);
 
-let detailVisible = ref(false);
-
-const handleOpenDetail = () => {
-  // console.log("click", columnsDetail);
-  detailVisible.value = true;
-};
-
-const detailInfo = ref([
-  {
-    label: "名称",
-    value: "admin"
-  },
-  {
-    label: "ID",
-    value: "202403271719201001"
-  },
-  {
-    label: "IP",
-    value: "127.0.0.1"
-  },
-  {
-    label: "取流模式",
-    value: "DirectProxy"
-  },
-  {
-    label: "url",
-    value: "rtsp://127.0.0.1/live/test.live.flv"
-  },
-  {
-    label: "创建时间",
-    value: "2024-03-29 00:06:00"
-  },
-  {
-    label: "更新时间",
-    value: "2024-03-29 00:06:00"
-  },
-  {
-    label: "rtsp",
-    value: "rtsp://127.0.0.1:554/live/test"
-  },
-  {
-    label: "rtmp",
-    value: "rtmp://127.0.0.1:2935/live/test"
-  },
-  {
-    label: "http-flv",
-    value: "http://127.0.0.1:8096/live/test.live.flv"
-  },
-  {
-    label: "http-fmp4",
-    value: "http://127.0.0.1:8096/live/test.live.mp4"
-  },
-  {
-    label: "hls",
-    value: "http://127.0.0.1:8096/live/test/hls.m3u8"
-  }
-]);
 const playDialogVisible = ref(false);
 const videoUrl = ref("");
 let dp = null;
@@ -331,7 +277,7 @@ const play = (id: String) => {
                 type="primary"
                 :size="size"
                 :icon="useRenderIcon(Info)"
-                @click="handleOpenDetail()"
+                @click="handleOpenDetail(row)"
               >
                 详情
               </el-button>

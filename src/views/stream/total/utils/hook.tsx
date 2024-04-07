@@ -29,6 +29,28 @@ const vendorImages = {
   4: { image: tdyImage, name: "天地伟业" }
 };
 
+const streamModes = {
+  0: { tagType: null, mode: "DirectProxy" }, // 蓝色
+  1: { tagType: "warning", mode: "SPCC" }, // 黄色
+  2: { tagType: "success", mode: "FFmpegCli" } // 绿色
+};
+
+const detailInfo = reactive({
+  name: { label: "名称", value: "" },
+  id: { label: "ID", value: "" },
+  ip: { label: "IP", value: "" },
+  vendor: { label: "设备厂商", value: -1 },
+  streamMode: { label: "取流模式", value: 0 },
+  url: { label: "url", value: "" },
+  rtsp: { label: "rtsp", value: "" },
+  rtmp: { label: "rtmp", value: "" },
+  http_flv: { label: "http-flv", value: "" },
+  http_fmp4: { label: "http-fmp4", value: "" },
+  hls: { label: "hls", value: "" },
+  createTime: { label: "创建时间", value: "0000-00-00 00:00:00" },
+  updateTime: { label: "更新时间", value: "0000-00-00 00:00:00" }
+});
+
 import {
   getKeyList,
   isAllEmpty,
@@ -72,6 +94,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     list: []
   });
 
+  let detailVisible = ref(false);
+
   const formRef = ref();
   const ruleFormRef = ref();
   const dataList = ref([]);
@@ -113,23 +137,24 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       prop: "ip",
       minWidth: 130
     },
-    // {
-    //   label: "Url",
-    //   prop: "url",
-    //   minWidth: 130,
-    //   cellRenderer: ({ row }) => (
-    //     <div
-    //       style={{
-    //         maxWidth: "130px", // 设置最大宽度
-    //         whiteSpace: "nowrap", // 文本不换行
-    //         overflow: "hidden", // 溢出部分隐藏
-    //         textOverflow: "ellipsis" // 超出部分显示省略号
-    //       }}
-    //     >
-    //       {row && row.url ? row.url : ""}
-    //     </div>
-    //   )
-    // },
+    {
+      hide: true,
+      label: "Url",
+      prop: "url",
+      minWidth: 130,
+      cellRenderer: ({ row }) => (
+        <div
+          style={{
+            maxWidth: "130px", // 设置最大宽度
+            whiteSpace: "nowrap", // 文本不换行
+            overflow: "hidden", // 溢出部分隐藏
+            textOverflow: "ellipsis" // 超出部分显示省略号
+          }}
+        >
+          {row && row.url ? row.url : ""}
+        </div>
+      )
+    },
     {
       label: "设备厂商", //1.海康 2.大华 3.宇视 4.天地伟业
       prop: "vendor",
@@ -166,21 +191,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       prop: "streamMode",
       minWidth: 130,
       cellRenderer: ({ row, props }) => {
-        let tagType = null;
-        let mode = "DirectProxy";
-        switch (row.streamMode) {
-          case 1:
-            tagType = "warning"; // 黄色
-            mode = "SPCC";
-            break;
-          case 2:
-            tagType = "success"; // 绿色
-            mode = "FFmpegCli";
-            break;
-          default:
-            tagType = null; // 默认
-            mode = "DirectProxy";
-        }
+        let tagType =
+          streamModes[row.streamMode]?.tagType || streamModes[0].tagType;
+        let mode = streamModes[row.streamMode]?.mode || streamModes[0].mode;
+
         return (
           <el-tag
             size={props.size}
@@ -583,22 +597,42 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     });
   }
 
+  const handleOpenDetail = row => {
+    // console.log("click", columnsDetail);
+    const ip = `${import.meta.env.VITE_APP_BASE_IP ? import.meta.env.VITE_APP_BASE_IP : window.location.hostname}`;
+    detailInfo["name"].value = row.name;
+    detailInfo["id"].value = row.id;
+    detailInfo["ip"].value = row.ip;
+
+    detailInfo["vendor"].value =
+      row.vendor && vendorImages[row.vendor]
+        ? vendorImages[row.vendor].name
+        : vendorImages[0].name;
+    detailInfo["streamMode"].value =
+      streamModes[row.streamMode]?.mode || streamModes[0].mode;
+    detailInfo["url"].value = row.url;
+
+    detailInfo["rtsp"].value = `rtsp://${ip}:554/live/${row.id}`;
+    detailInfo["rtmp"].value = `rtmp://${ip}:2935/live/${row.id}`;
+    detailInfo["http_flv"].value = `http://${ip}:8096/live/${row.id}.live.flv`;
+    detailInfo["http_fmp4"].value = `http://${ip}:8096/live/${row.id}.lvie.mp4`;
+    detailInfo["hls"].value = `http://${ip}:8096/live/${row.id}/hls.m3u8`;
+
+    //TODO:接口获取 时间
+    detailInfo["createTime"].value = "";
+    detailInfo["updateTime"].value = "";
+    detailVisible.value = true;
+  };
+
   onMounted(async () => {
     treeLoading.value = true;
     fetchAll();
-
-    // 归属部门
-    // const { data } = await getDeptList();
-    // higherDeptOptions.value = handleTree(data);
-    // treeData.value = handleTree(data);
-    // treeLoading.value = false;
-
-    // 角色列表
-    // roleOptions.value = (await getAllRoleList()).data;
   });
 
   return {
     form,
+    detailVisible,
+    detailInfo,
     loading,
     columns,
     dataList,
@@ -621,6 +655,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     handleSizeChange,
     onSelectionCancel,
     handleCurrentChange,
-    handleSelectionChange
+    handleSelectionChange,
+    handleOpenDetail
   };
 }
