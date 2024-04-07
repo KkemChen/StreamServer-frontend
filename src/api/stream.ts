@@ -23,8 +23,14 @@ type ResultTable = {
 //   return http.request<ResultTable>("post", "/user", { data });
 // };
 
-export const getUserList = (data?: object) => {
+/** 获取全部流信息 */
+export const getStreamInfo = (data?: object) => {
   return http.request<ResultTable>("post", "/api/v1/stream/info", { data });
+};
+
+/** 获取单个流详细信息 */
+export const queryStreamInfo = (data?: object) => {
+  return http.request<Result>("post", "/api/v1/stream/query", { data });
 };
 
 /** 系统管理-用户管理-获取所有角色列表 */

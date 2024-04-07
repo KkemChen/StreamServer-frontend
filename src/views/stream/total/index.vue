@@ -39,7 +39,7 @@ const {
   pagination,
   buttonClass,
   deviceDetection,
-  onSearch,
+  fetchAll,
   resetForm,
   onbatchDel,
   openDialog,
@@ -185,39 +185,39 @@ const play = (id: String) => {
         :model="form"
         class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
       >
-        <el-form-item label="名称" prop="username">
+        <el-form-item label="名称" prop="cameraName">
           <el-input
-            v-model="form.username"
-            placeholder="please input camera name"
+            v-model="form.name"
+            placeholder="请输入名称"
             clearable
             class="!w-[180px]"
           />
         </el-form-item>
-        <el-form-item label="ID" prop="phone">
+        <el-form-item label="ID" prop="id">
           <el-input
-            v-model="form.phone"
-            placeholder="please input id"
+            v-model="form.id"
+            placeholder="请输入ID"
             clearable
             class="!w-[180px]"
           />
         </el-form-item>
-        <!--  <el-form-item label="状态：" prop="status">
-          <el-select
-            v-model="form.status"
-            placeholder="请选择"
+        <el-form-item label="IP" prop="ip">
+          <el-input
+            v-model="form.ip"
+            placeholder="请输入IP地址"
             clearable
             class="!w-[180px]"
           >
             <el-option label="已开启" value="1" />
             <el-option label="已关闭" value="0" />
-          </el-select>
-        </el-form-item> -->
+          </el-input>
+        </el-form-item>
         <el-form-item>
           <el-button
             type="primary"
             :icon="useRenderIcon('ri:search-line')"
             :loading="loading"
-            @click="onSearch"
+            @click="fetchAll(form)"
           >
             搜索
           </el-button>
@@ -230,7 +230,7 @@ const play = (id: String) => {
       <PureTableBar
         title="ivss_stream_info"
         :columns="columns"
-        @refresh="onSearch"
+        @refresh="fetchAll"
       >
         <template #buttons>
           <el-button

@@ -38,7 +38,7 @@ import {
 import {
   getRoleIds,
   // getDeptList,
-  getUserList,
+  getStreamInfo,
   getAllRoleList
 } from "@/api/stream";
 import {
@@ -62,12 +62,16 @@ import { retrieveColumnLayout } from "echarts/types/src/layout/barGrid.js";
 
 export function useUser(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
-    // 左侧部门树的id
-    deptId: "",
-    username: "",
-    phone: "",
-    status: ""
+    //搜索条件
+    id: "",
+    ip: "",
+    name: ""
   });
+
+  const streamInfo = reactive<{ list: any[] }>({
+    list: []
+  });
+
   const formRef = ref();
   const ruleFormRef = ref();
   const dataList = ref([]);
@@ -82,9 +86,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const selectedNum = ref(0);
   const pagination = reactive<PaginationProps>({
     total: 0,
-    pageSize: 10,
+    pageSize: 20,
     currentPage: 1,
-    background: true
+    background: true,
+    pageSizes: [10, 20, 50, 100]
   });
   const columns: TableColumnList = [
     {
@@ -209,7 +214,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
                 d="M20 22h-2v-2a3 3 0 0 0-3-3H9a3 3 0 0 0-3 3v2H4v-2a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5zm-8-9a6 6 0 1 1 0-12a6 6 0 0 1 0 12m0-2a4 4 0 1 0 0-8a4 4 0 0 0 0 8"
               />
             </svg>
-            <span>&nbsp;6</span>
+            <span>&nbsp;0</span>
           </Tag>
         );
       }
@@ -259,7 +264,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const curScore = ref();
   const roleOptions = ref([]);
 
-  function onChange({ row, index }) {
+  /*   function onChange({ row, index }) {
     ElMessageBox.confirm(
       `确认要<strong>${
         row.status === 0 ? "停用" : "启用"
@@ -299,22 +304,24 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       .catch(() => {
         row.status === 0 ? (row.status = 1) : (row.status = 0);
       });
-  }
+  } */
 
   function handleUpdate(row) {
     console.log(row);
   }
 
   function handleDelete(row) {
-    message(`您删除了用户编号为${row.id}的这条数据`, { type: "success" });
-    onSearch();
+    message(`您删除了ID: ${row.id}的这条数据`, { type: "success" });
+    fetchAll();
   }
 
   function handleSizeChange(val: number) {
+    handlePagination();
     console.log(`${val} items per page`);
   }
 
   function handleCurrentChange(val: number) {
+    handlePagination();
     console.log(`current page: ${val}`);
   }
 
@@ -341,17 +348,26 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       type: "success"
     });
     tableRef.value.getTableRef().clearSelection();
-    onSearch();
+    fetchAll();
   }
 
-  async function onSearch() {
+  function handlePagination() {
+    const startIndex = (pagination.currentPage - 1) * pagination.pageSize;
+    // 计算当前页的结束索引
+    const endIndex = startIndex + pagination.pageSize;
+    // 返回当前页的数据
+    dataList.value = streamInfo.list.slice(startIndex, endIndex);
+  }
+
+  async function fetchAll(form?) {
     loading.value = true;
-    const { data } = await getUserList(toRaw(form));
+    const { data } = form
+      ? await getStreamInfo(toRaw(form))
+      : await getStreamInfo({});
     console.log(data);
-    dataList.value = data.list;
+    streamInfo.list = data.list;
     pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
+    handlePagination();
     setTimeout(() => {
       loading.value = false;
     }, 500);
@@ -360,14 +376,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const resetForm = formEl => {
     if (!formEl) return;
     formEl.resetFields();
-    form.deptId = "";
-    treeRef.value.onTreeReset();
-    onSearch();
+    // form.deptId = "";
+    // treeRef.value.onTreeReset();
+    fetchAll();
   };
 
   function onTreeSelect({ id, selected }) {
-    form.deptId = selected ? id : "";
-    onSearch();
+    // form.deptId = selected ? id : "";
+    fetchAll();
   }
 
   function formatHigherDeptOptions(treeList) {
@@ -389,7 +405,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         formInline: {
           title,
           higherDeptOptions: formatHigherDeptOptions(higherDeptOptions.value),
-          id: row?.id ?? 0,
+          id: row?.id ?? "",
           /** 用于判断是`新增`还是`修改` */
           name: row?.name,
           streamMode: row?.streamMode,
@@ -414,7 +430,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
             type: "success"
           });
           done(); // 关闭弹框
-          onSearch(); // 刷新表格数据
+          fetchAll(); // 刷新表格数据
         }
         FormRef.validate(valid => {
           if (valid) {
@@ -452,7 +468,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         console.log("裁剪后的图片信息：", avatarInfo.value);
         // 根据实际业务使用avatarInfo.value和row里的某些字段去调用上传头像接口即可
         done(); // 关闭弹框
-        onSearch(); // 刷新表格数据
+        fetchAll(); // 刷新表格数据
       },
       closeCallBack: () => cropRef.value.hidePopover()
     });
@@ -531,7 +547,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
             console.log(pwdForm.newPwd);
             // 根据实际业务使用pwdForm.newPwd和row里的某些字段去调用重置用户密码接口即可
             done(); // 关闭弹框
-            onSearch(); // 刷新表格数据
+            fetchAll(); // 刷新表格数据
           }
         });
       }
@@ -569,7 +585,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
 
   onMounted(async () => {
     treeLoading.value = true;
-    onSearch();
+    fetchAll();
 
     // 归属部门
     // const { data } = await getDeptList();
@@ -592,7 +608,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     pagination,
     buttonClass,
     deviceDetection,
-    onSearch,
+    fetchAll,
     resetForm,
     onbatchDel,
     openDialog,
