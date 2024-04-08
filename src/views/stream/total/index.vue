@@ -42,6 +42,7 @@ const {
   buttonClass,
   deviceDetection,
   fetchAll,
+  onSearch,
   resetForm,
   onbatchDel,
   openDialog,
@@ -163,7 +164,7 @@ const play = (id: String) => {
             type="primary"
             :icon="useRenderIcon('ri:search-line')"
             :loading="loading"
-            @click="fetchAll(form)"
+            @click="onSearch(form)"
           >
             搜索
           </el-button>

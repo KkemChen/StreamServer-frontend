@@ -94,6 +94,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     list: []
   });
 
+  const streamInfoCache = reactive<{ list: any[] }>({
+    list: []
+  });
+
   let detailVisible = ref(false);
 
   const formRef = ref();
@@ -248,6 +252,18 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     //     dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
     // },
     {
+      hide: true,
+      label: "创建时间",
+      prop: "createTime",
+      minWidth: 130
+    },
+    {
+      hide: true,
+      label: "更新时间",
+      prop: "updateTime",
+      minWidth: 130
+    },
+    {
       label: "操作",
       fixed: "right",
       width: 300,
@@ -373,12 +389,11 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     dataList.value = streamInfo.list.slice(startIndex, endIndex);
   }
 
-  async function fetchAll(form?) {
+  async function fetchAll() {
     loading.value = true;
-    const { data } = form
-      ? await getStreamInfo(toRaw(form))
-      : await getStreamInfo({});
+    const { data } = await getStreamInfo({});
     console.log(data);
+    streamInfoCache.list = data.list;
     streamInfo.list = data.list;
     pagination.total = data.total;
     handlePagination();
@@ -387,17 +402,47 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     }, 500);
   }
 
+  async function onSearch(form) {
+    streamInfo.list;
+    loading.value = true;
+
+    function matchesCriteria(
+      value: string | undefined,
+      criteria: string | undefined
+    ): boolean {
+      if (!criteria) return true; // 如果没有提供筛选条件，则视为匹配
+      if (!value) return false; // 如果目标值不存在，直接返回不匹配
+      return value.includes(criteria);
+    }
+
+    const filteredList = streamInfoCache.list.filter(
+      info =>
+        matchesCriteria(info.id, form.id) &&
+        matchesCriteria(info.ip, form.ip) &&
+        matchesCriteria(info.name, form.name)
+    );
+    streamInfo.list = filteredList;
+    pagination.total = filteredList.length;
+    handlePagination();
+    loading.value = false;
+  }
+
   const resetForm = formEl => {
     if (!formEl) return;
     formEl.resetFields();
     // form.deptId = "";
     // treeRef.value.onTreeReset();
-    fetchAll();
+    // fetchAll();
+    loading.value = true;
+    streamInfo.list = streamInfoCache.list;
+    pagination.total = streamInfoCache.list.length;
+    handlePagination();
+    loading.value = false;
   };
 
   function onTreeSelect({ id, selected }) {
     // form.deptId = selected ? id : "";
-    fetchAll();
+    // fetchAll();
   }
 
   function formatHigherDeptOptions(treeList) {
@@ -618,9 +663,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     detailInfo["http_fmp4"].value = `http://${ip}:8096/live/${row.id}.lvie.mp4`;
     detailInfo["hls"].value = `http://${ip}:8096/live/${row.id}/hls.m3u8`;
 
-    //TODO:接口获取 时间
-    detailInfo["createTime"].value = "";
-    detailInfo["updateTime"].value = "";
+    detailInfo["createTime"].value = row.createTime ? row.createTime : "";
+    detailInfo["updateTime"].value = row.updateTime ? row.updateTime : "";
     detailVisible.value = true;
   };
 
@@ -643,6 +687,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     buttonClass,
     deviceDetection,
     fetchAll,
+    onSearch,
     resetForm,
     onbatchDel,
     openDialog,
