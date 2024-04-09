@@ -5,6 +5,7 @@ interface FormItemProps {
   higherDeptOptions: Record<string, unknown>[];
   name: string;
   streamMode: number;
+  streamType: number;
   vendor: number;
   ip: string;
   url: string;

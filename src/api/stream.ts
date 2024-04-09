@@ -28,26 +28,30 @@ export const getStreamInfo = (data?: object) => {
   return http.request<ResultTable>("post", "/api/v1/stream/info", { data });
 };
 
-/** 获取单个流详细信息 */
-export const queryStreamInfo = (data?: object) => {
-  return http.request<Result>("post", "/api/v1/stream/query", { data });
+/** 新增一个流 */
+export const addStreamInfo = (data?: object) => {
+  return http.request<Result>("post", "/api/v1/stream/add", { data });
 };
 
-/** 系统管理-用户管理-获取所有角色列表 */
-export const getAllRoleList = () => {
-  return http.request<Result>("get", "/list-all-role");
+/** 删除一个流 */
+export const delStreamInfo = (data?: object) => {
+  return http.request<Result>("post", "/api/v1/stream/del", { data });
 };
-
-/** 系统管理-用户管理-根据userId，获取对应角色id列表（userId：用户id） */
-export const getRoleIds = (data?: object) => {
-  return http.request<Result>("post", "/list-role-ids", { data });
-};
-
-/** 获取系统管理-角色管理列表 */
-export const getRoleList = (data?: object) => {
-  return http.request<ResultTable>("post", "/role", { data });
-};
-/** 获取系统管理-部门管理列表 */
-// export const getDeptList = (data?: object) => {
-//   return http.request<Result>("post", "/dept", { data });
+// /** 系统管理-用户管理-获取所有角色列表 */
+// export const getAllRoleList = () => {
+//   return http.request<Result>("get", "/list-all-role");
 // };
+
+// /** 系统管理-用户管理-根据userId，获取对应角色id列表（userId：用户id） */
+// export const getRoleIds = (data?: object) => {
+//   return http.request<Result>("post", "/list-role-ids", { data });
+// };
+
+// /** 获取系统管理-角色管理列表 */
+// export const getRoleList = (data?: object) => {
+//   return http.request<ResultTable>("post", "/role", { data });
+// };
+// /** 获取系统管理-部门管理列表 */
+// // export const getDeptList = (data?: object) => {
+// //   return http.request<Result>("post", "/dept", { data });
+// // };

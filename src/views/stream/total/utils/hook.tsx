@@ -35,12 +35,19 @@ const streamModes = {
   2: { tagType: "success", mode: "FFmpegCli" } // 绿色
 };
 
+const streamTypes = {
+  0: "其他码流",
+  1: "主码流",
+  2: "子码流"
+};
+
 const detailInfo = reactive({
   name: { label: "名称", value: "" },
   id: { label: "ID", value: "" },
   ip: { label: "IP", value: "" },
   vendor: { label: "设备厂商", value: -1 },
   streamMode: { label: "取流模式", value: 0 },
+  streamType: { label: "码流类型", value: 0 },
   url: { label: "url", value: "" },
   rtsp: { label: "rtsp", value: "" },
   rtmp: { label: "rtmp", value: "" },
@@ -58,10 +65,12 @@ import {
   deviceDetection
 } from "@pureadmin/utils";
 import {
-  getRoleIds,
+  // getRoleIds,
   // getDeptList,
   getStreamInfo,
-  getAllRoleList
+  addStreamInfo,
+  delStreamInfo
+  // getAllRoleList
 } from "@/api/stream";
 import {
   ElForm,
@@ -214,6 +223,16 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       }
     },
     {
+      hide: true,
+      label: "码流类型",
+      prop: "streamType",
+      minWidth: 130,
+      cellRenderer: ({ row, props }) => {
+        let type = streamTypes[row.streamType] || streamTypes[0];
+        return <span>{type}</span>;
+      }
+    },
+    {
       label: "状态",
       prop: "status",
       minWidth: 90,
@@ -340,8 +359,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     console.log(row);
   }
 
-  function handleDelete(row) {
+  async function handleDelete(row) {
     message(`您删除了ID: ${row.id}的这条数据`, { type: "success" });
+    console.log(toRaw(row));
+    await delStreamInfo(toRaw(row));
     fetchAll();
   }
 
@@ -370,11 +391,12 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   }
 
   /** 批量删除 */
-  function onbatchDel() {
+  async function onbatchDel() {
     // 返回当前选中的行
     const curSelected = tableRef.value.getTableRef().getSelectionRows();
     // 接下来根据实际业务，通过选中行的某项数据，比如下面的id，调用接口进行批量删除
-    message(`已删除用户编号为 ${getKeyList(curSelected, "id")} 的数据`, {
+    await delStreamInfo(curSelected);
+    message(`已删除ID为 ${getKeyList(curSelected, "id")} 的数据`, {
       type: "success"
     });
     tableRef.value.getTableRef().clearSelection();
@@ -392,14 +414,15 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   async function fetchAll() {
     loading.value = true;
     const { data } = await getStreamInfo({});
-    console.log(data);
+    // console.log(data);
     streamInfoCache.list = data.list;
     streamInfo.list = data.list;
     pagination.total = data.total;
     handlePagination();
-    setTimeout(() => {
-      loading.value = false;
-    }, 500);
+    loading.value = false;
+    // setTimeout(() => {
+    //   loading.value = false;
+    // }, 500);
   }
 
   async function onSearch(form) {
@@ -467,8 +490,9 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           id: row?.id ?? "",
           /** 用于判断是`新增`还是`修改` */
           name: row?.name,
-          streamMode: row?.streamMode,
-          vendor: row?.vendor,
+          streamMode: row?.streamMode ?? 0,
+          vendor: row?.vendor ?? 0,
+          streamType: row?.streamType ?? 0,
           ip: row?.ip,
           url: row?.url,
           status: row?.status,
@@ -481,7 +505,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       fullscreenIcon: true,
       closeOnClickModal: false,
       contentRenderer: () => h(editForm, { ref: formRef }),
-      beforeSure: (done, { options }) => {
+      beforeSure: async (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
         function chores() {
@@ -491,12 +515,13 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           done(); // 关闭弹框
           fetchAll(); // 刷新表格数据
         }
-        FormRef.validate(valid => {
+        FormRef.validate(async valid => {
           if (valid) {
             console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
+              await addStreamInfo(curData);
               chores();
             } else {
               // 实际开发先调用修改接口，再进行下面操作
@@ -655,6 +680,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         : vendorImages[0].name;
     detailInfo["streamMode"].value =
       streamModes[row.streamMode]?.mode || streamModes[0].mode;
+    detailInfo["streamType"].value =
+      streamTypes[row.streamType] || streamTypes[0];
     detailInfo["url"].value = row.url;
 
     detailInfo["rtsp"].value = `rtsp://${ip}:554/live/${row.id}`;

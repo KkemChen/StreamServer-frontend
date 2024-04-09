@@ -14,6 +14,7 @@ const props = withDefaults(defineProps<FormProps>(), {
     higherDeptOptions: [],
     name: "",
     streamMode: 0,
+    streamType: 0,
     vendor: 0,
     ip: "",
     url: "",
@@ -60,6 +61,21 @@ const streamModeOptions = [
   }
 ];
 
+const streamTypeOptions = [
+  {
+    value: 1,
+    label: "主码流"
+  },
+  {
+    value: 2,
+    label: "子码流"
+  },
+  {
+    value: 0,
+    label: "其他码流"
+  }
+];
+
 const ruleFormRef = ref();
 const { switchStyle } = usePublicHooks();
 const newFormInline = ref(props.formInline);
@@ -79,8 +95,8 @@ defineExpose({ getRef });
     label-width="82px"
   >
     <el-row :gutter="30">
-      <re-col :value="24" :xs="24" :sm="24">
-        <el-form-item label="id" prop="id">
+      <re-col :value="12" :xs="24" :sm="24">
+        <el-form-item label="ID" prop="id">
           <el-input
             v-model="newFormInline.id"
             clearable
@@ -89,7 +105,6 @@ defineExpose({ getRef });
           />
         </el-form-item>
       </re-col>
-
       <re-col :value="12" :xs="24" :sm="24">
         <el-form-item label="名称" prop="name">
           <el-input
@@ -99,7 +114,6 @@ defineExpose({ getRef });
           />
         </el-form-item>
       </re-col>
-
       <re-col :value="12" :xs="24" :sm="24">
         <el-form-item label="IP地址" prop="ip">
           <el-input
@@ -109,7 +123,22 @@ defineExpose({ getRef });
           />
         </el-form-item>
       </re-col>
-
+      <re-col :value="12" :xs="24" :sm="24">
+        <el-form-item label="码流类型">
+          <el-select
+            v-model="newFormInline.vendor"
+            placeholder="请选择码流类型"
+            class="w-full"
+          >
+            <el-option
+              v-for="(item, index) in streamTypeOptions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+      </re-col>
       <re-col :value="12" :xs="24" :sm="24">
         <el-form-item label="设备厂商">
           <el-select
@@ -154,7 +183,7 @@ defineExpose({ getRef });
         </el-form-item>
       </re-col>
       <re-col>
-        <JsonView />
+        <!-- <JsonView /> -->
       </re-col>
     </el-row>
   </el-form>
