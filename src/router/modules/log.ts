@@ -2,22 +2,22 @@ const { VITE_HIDE_HOME } = import.meta.env;
 const Layout = () => import("@/layout/index.vue");
 
 export default {
-  path: "/",
-  name: "Home",
+  path: "/log",
+  name: "Log",
   component: Layout,
-  redirect: "/home",
+  redirect: "/log",
   meta: {
-    icon: "ep:home-filled",
-    title: "首页",
-    rank: 0
+    icon: "ri:blogger-fill",
+    title: "日志",
+    rank: 3
   },
   children: [
     {
-      path: "/home",
-      name: "Home",
-      component: () => import("@/views/home/index.vue"),
+      path: "/log",
+      name: "Log",
+      component: () => import("@/views/log/index.vue"),
       meta: {
-        title: "首页",
+        title: "日志",
         showLink: VITE_HIDE_HOME === "true" ? false : true
       }
     }
