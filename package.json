@@ -53,6 +53,7 @@
     "@pureadmin/utils": "^2.4.7",
     "@vueuse/core": "^10.9.0",
     "@vueuse/motion": "^2.1.0",
+    "@xterm/xterm": "^5.5.0",
     "@zxcvbn-ts/core": "^3.0.4",
     "animate.css": "^4.1.1",
     "axios": "^1.6.8",
@@ -78,7 +79,8 @@
     "vue": "^3.4.21",
     "vue-json-pretty": "^2.4.0",
     "vue-router": "^4.3.0",
-    "vue-tippy": "^6.4.1"
+    "vue-tippy": "^6.4.1",
+    "xterm-addon-fit": "^0.8.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.2.1",
