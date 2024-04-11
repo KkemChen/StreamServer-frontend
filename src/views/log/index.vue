@@ -1,14 +1,34 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "xterm-addon-fit"; // 取消这行的注释
 import "@xterm/xterm/css/xterm.css";
 
-const fitAddon = new FitAddon(); // 创建 FitAddon 实例
+const logLevelColors = {
+  INFO: "\x1b[32m", // 绿色
+  TRACE: "\x1b[34m", // 蓝色
+  DEBUG: "\x1b[36m", // 青色
+  WARN: "\x1b[33m", // 黄色
+  ERROR: "\x1b[31m", // 红色
+  FATAL: "\x1b[35m" // 明亮红色
+};
+
+function colorizeLog(log) {
+  // 使用正则表达式从日志中提取日志级别
+  const logLevelMatch = log.match(/\[(INFO|TRACE|DEBUG|WARN|ERROR|FATAL)\]/);
+  if (logLevelMatch) {
+    const logLevel = logLevelMatch[1];
+    // 获取对应日志级别的颜色代码
+    const colorCode = logLevelColors[logLevel] || "";
+    // 将颜色代码应用到整条日志上，并在末尾重置颜色
+    return `${colorCode}${log}\x1b[0m`;
+  }
+  return log; // 如果没有匹配到日志级别，返回原始日志
+}
 
 const defaultTheme = {
   foreground: "#ffffff", // 字体
-  background: "#000000", // 背景色
+  background: "#010101", // 背景色
   cursor: "#ffffff", // 设置光标
   selection: "rgba(235, 235, 235, 0.3)",
   black: "#000000",
@@ -30,22 +50,79 @@ const defaultTheme = {
 };
 
 const term = new Terminal({
+  cursorStyle: "bar", // 光标样式：'block', 'underline', 'bar'
+  cursorBlink: true, // 光标闪烁
+  cursorWidth: 2, // 光标宽度（仅在'bar'样式下有效）
+  // readOnly: true,
+  fontFamily: '"Cascadia Code"',
+  cols: 120,
+  scrollback: 50000,
   theme: defaultTheme
+  // disableStdin: true
 });
+
+let ws;
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5; // 最大重连尝试次数
+
+const connectWebSocket = () => {
+  ws = new WebSocket(
+    `ws://${import.meta.env.VITE_APP_BASE_IP ? import.meta.env.VITE_APP_BASE_IP : window.location.hostname}:8088/ws/log`
+  );
+};
+
 onMounted(() => {
+  const fitAddon = new FitAddon(); // 创建 FitAddon 实例
   const container = document.getElementById("xterm-container");
+  // term.setOption('scrollbarHidden',true)
   term.loadAddon(fitAddon); // 加载 FitAddon
   term.open(container);
   fitAddon.fit(); // 自动调整大小以适应容器
 
-  // 随机生成日志
-  const generateLog = () => {
-    const log = `[2024-04-10 17:13:32.060] [INFO] |15917|: Log ${Math.random()} ${Math.random()} ${Math.random()}`;
-    term.writeln(log);
+  connectWebSocket();
+  ws.onopen = () => {
+    console.log("WebSocket connection success");
+    term.writeln(
+      `============================================================================`
+    );
+    term.writeln("\x1b[32m[Xterm]: StreamServer connect success!\x1b[0m");
+    term.writeln(
+      `============================================================================\n`
+    );
+    reconnectAttempts = 0; // 重置重连尝试次数
   };
 
-  // 每秒生成一条随机日志
-  setInterval(generateLog, 100);
+  ws.onerror = event => {
+    console.log("WebSocket connection error", event);
+    if (reconnectAttempts < maxReconnectAttempts) {
+      setTimeout(connectWebSocket, 5000 * reconnectAttempts); // 使用指数回退策略增加重连延迟
+      reconnectAttempts++;
+    } else {
+      console.error("WebSocket connection failed after maximum attempts.");
+    }
+  };
+
+  ws.onmessage = event => {
+    let log = event.data.replace(/\n$/, "");
+    const colorizedLog = colorizeLog(log);
+    term.writeln(colorizedLog);
+  };
+
+  // ws.onclose = event => {
+  //   console.log("WebSocket connection closed", event);
+  //   // 可选：在这里处理非正常关闭情况下的重连逻辑
+  //   if (!event.wasClean && reconnectAttempts < maxReconnectAttempts) {
+  //     setTimeout(connectWebSocket, 5000 * reconnectAttempts); // 使用指数回退策略增加重连延迟
+  //     reconnectAttempts++;
+  //   }
+  // };
+});
+
+onBeforeUnmount(() => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    // 使用状态码 1000（正常关闭）和一个原因
+    ws.close();
+  }
 });
 </script>
 
@@ -59,6 +136,20 @@ onMounted(() => {
 
 <style scoped>
 /* 确保 #xterm-container 元素满屏 */
+
+#xterm-container {
+  position: absolute;
+  top: 80px;
+  left: 100px;
+  width: calc(100% - 100px - 100px);
+  height: calc(100% - 60px - 80px);
+  z-index: 5; /* 确保它在.glitch之上 */
+  /* padding-left: 100px; */
+  :deep(.xterm-viewport) {
+    overflow: hidden !important;
+  }
+}
+
 .wrapper {
   position: relative;
   width: 100%;
@@ -70,20 +161,11 @@ onMounted(() => {
   position: fixed;
   top: 0;
   left: 0;
-  background-color: black;
+  background-color: #010101;
   width: 100%;
   height: 100%;
   z-index: 1;
-}
-
-#xterm-container {
-  position: absolute;
-  top: 80px;
-  left: 100px;
-  width: 100%;
-  height: calc(100% - 60px - 40px);
-  z-index: 5; /* 确保它在.glitch之上 */
-  /* padding-left: 100px; */
+  pointer-events: none;
 }
 
 .glitch {
@@ -100,6 +182,7 @@ onMounted(() => {
   overflow: hidden;
   margin: 0px !important;
   z-index: 10;
+  pointer-events: none;
 }
 
 .glitch::before,

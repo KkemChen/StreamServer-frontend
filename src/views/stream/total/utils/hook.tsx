@@ -148,7 +148,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "IP地址",
       prop: "ip",
-      minWidth: 130
+      minWidth: 80
     },
     {
       hide: true,
@@ -171,7 +171,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "设备厂商", //1.海康 2.大华 3.宇视 4.天地伟业
       prop: "vendor",
-      minWidth: 130,
+      minWidth: 80,
       // align: "left",
       cellRenderer: ({ row }) => (
         <div>
@@ -202,7 +202,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "取流模式",
       prop: "streamMode",
-      minWidth: 130,
+      minWidth: 80,
       cellRenderer: ({ row, props }) => {
         let tagType =
           streamModes[row.streamMode]?.tagType || streamModes[0].tagType;
@@ -226,7 +226,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       hide: true,
       label: "码流类型",
       prop: "streamType",
-      minWidth: 130,
+      minWidth: 80,
       cellRenderer: ({ row, props }) => {
         let type = streamTypes[row.streamType] || streamTypes[0];
         return <span>{type}</span>;
@@ -235,7 +235,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "状态",
       prop: "status",
-      minWidth: 90,
+      minWidth: 80,
       cellRenderer: scope => {
         const icon = useRenderIcon("ri:search-line");
         return (
