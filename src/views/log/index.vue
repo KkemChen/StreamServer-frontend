@@ -72,6 +72,19 @@ const connectWebSocket = () => {
     `ws://${import.meta.env.VITE_APP_BASE_IP ? import.meta.env.VITE_APP_BASE_IP : window.location.hostname}:8088/ws/log`
   );
 };
+const asciiArt = [
+  "\x1b[1m\x1b[5m\x1b[93m",
+  "============================================================================",
+  " _____ _                            _____                          ",
+  "/  ___| |                          /  ___|                         ",
+  "\\ `--.| |_ _ __ ___  __ _ _ __ ___ \\ `--.  ___ _ ____   _____ _ __ ",
+  " `--. \\ __| '__/ _ \\/ _` | '_ ` _ \\ `--. \\/ _ \\ '__\\ \\ / / _ \\ '__|",
+  "/\\__/ / |_| | |  __/ (_| | | | | | /\\__/ /  __/ |   \\ V /  __/ |   ",
+  "\\____/ \\__|_|  \\___|\\__,_|_| |_| |_\\____/ \\___|_|    \\_/ \\___|_|   ",
+  "",
+  "============================================================================",
+  "\x1b[0m",
+];
 
 onMounted(() => {
   const fitAddon = new FitAddon(); // 创建 FitAddon 实例
@@ -84,13 +97,11 @@ onMounted(() => {
   connectWebSocket();
   ws.onopen = () => {
     console.log("WebSocket connection success");
-    term.writeln(
-      `============================================================================`
-    );
-    term.writeln("\x1b[32m[Xterm]: StreamServer connect success!\x1b[0m");
-    term.writeln(
-      `============================================================================\n`
-    );
+
+    asciiArt.forEach(line => {
+      term.writeln(line); // 逐行输出
+    });
+
     reconnectAttempts = 0; // 重置重连尝试次数
   };
 
