@@ -56,7 +56,7 @@ const term = new Terminal({
   cursorBlink: true, // 光标闪烁
   cursorWidth: 2, // 光标宽度（仅在'bar'样式下有效）
   // readOnly: true,
-  fontFamily: '"Cascadia Code"',
+  fontFamily: '"Courier New"',
   cols: 120,
   scrollback: 50000,
   theme: defaultTheme
