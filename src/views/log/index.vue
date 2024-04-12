@@ -83,7 +83,7 @@ const asciiArt = [
   "\\____/ \\__|_|  \\___|\\__,_|_| |_| |_\\____/ \\___|_|    \\_/ \\___|_|   ",
   "",
   "============================================================================",
-  "\x1b[0m",
+  "\x1b[0m"
 ];
 
 onMounted(() => {
@@ -160,7 +160,11 @@ onBeforeUnmount(() => {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   color: #fff;
-  background: radial-gradient(ellipse at bottom, #1c2837 0%, #050608 100%);
+  background: radial-gradient(
+    ellipse 100% 100% at 70% 50%,
+    #27384d 0%,
+    #181c25 100%
+  );
   background-attachment: fixed;
 }
 
@@ -721,5 +725,6 @@ onBeforeUnmount(() => {
   top: 10%;
   left: 25%;
   pointer-events: none;
+  /* background: none; */
 }
 </style>
