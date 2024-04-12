@@ -525,6 +525,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
               chores();
             } else {
               // 实际开发先调用修改接口，再进行下面操作
+              await addStreamInfo(curData);
               chores();
             }
           }
