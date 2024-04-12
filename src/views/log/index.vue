@@ -688,10 +688,8 @@ onBeforeUnmount(() => {
   left: 100px;
   width: calc(100% - 100px - 100px);
   height: calc(100% - 60px - 80px);
-  z-index: 5; /* 确保它在.glitch之上 */
-  /* padding-left: 100px; */
+  z-index: 10;
 
-  /* scrollbar-color: #888 transparent !important; */
   ::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 0;
@@ -725,6 +723,7 @@ onBeforeUnmount(() => {
   top: 10%;
   left: 25%;
   pointer-events: none;
+  z-index: 1;
   /* background: none; */
 }
 </style>
