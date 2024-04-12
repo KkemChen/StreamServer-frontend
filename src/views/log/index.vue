@@ -675,8 +675,31 @@ onBeforeUnmount(() => {
   height: calc(100% - 60px - 80px);
   z-index: 5; /* 确保它在.glitch之上 */
   /* padding-left: 100px; */
+
+  /* scrollbar-color: #888 transparent !important; */
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+  }
+
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.8);
+    transition: color 0.2s ease;
+  }
+
   :deep(.xterm-viewport) {
     overflow: hidden !important;
+  }
+  :hover :deep(.xterm-viewport) {
+    overflow: auto !important;
   }
 }
 
@@ -686,5 +709,6 @@ onBeforeUnmount(() => {
   height: 100%;
   top: 10%;
   left: 25%;
+  pointer-events: none;
 }
 </style>
