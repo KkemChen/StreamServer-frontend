@@ -126,7 +126,7 @@ defineExpose({ getRef });
       <re-col :value="12" :xs="24" :sm="24">
         <el-form-item label="码流类型">
           <el-select
-            v-model="newFormInline.vendor"
+            v-model="newFormInline.streamType"
             placeholder="请选择码流类型"
             class="w-full"
           >
