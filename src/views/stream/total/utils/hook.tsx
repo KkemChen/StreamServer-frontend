@@ -1,5 +1,6 @@
 import "./reset.css";
 import dayjs from "dayjs";
+import { onBeforeUnmount } from "vue";
 import roleForm from "../form/role.vue";
 import editForm from "../form/index.vue";
 import { zxcvbn } from "@zxcvbn-ts/core";
@@ -236,7 +237,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       label: "状态",
       prop: "status",
       minWidth: 80,
-      cellRenderer: scope => {
+      cellRenderer: ({ row, props }) => {
         const icon = useRenderIcon("ri:search-line");
         return (
           <Tag severity="Primary" rounded style="height:1.5rem">
@@ -251,7 +252,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
                 d="M20 22h-2v-2a3 3 0 0 0-3-3H9a3 3 0 0 0-3 3v2H4v-2a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5zm-8-9a6 6 0 1 1 0-12a6 6 0 0 1 0 12m0-2a4 4 0 1 0 0-8a4 4 0 0 0 0 8"
               />
             </svg>
-            <span>&nbsp;0</span>
+            <span>&nbsp;{row.status.playerCount}</span>
           </Tag>
         );
       }
@@ -696,11 +697,51 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     detailVisible.value = true;
   };
 
+  let ws;
+  async function connectWebSocket() {
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5; // 最大重连尝试次数
+
+    ws = new WebSocket(
+      `ws://${import.meta.env.VITE_APP_BASE_IP ? import.meta.env.VITE_APP_BASE_IP : window.location.hostname}:8088/ws/stream/status`
+    );
+
+    ws.onopen = () => {
+      console.log("WebSocket connection success");
+      reconnectAttempts = 0; // 重置重连尝试次数
+    };
+
+    ws.onerror = event => {
+      console.log("WebSocket connection error", event);
+      if (reconnectAttempts < maxReconnectAttempts) {
+        setTimeout(connectWebSocket, 5000 * reconnectAttempts); // 使用指数回退策略增加重连延迟
+        reconnectAttempts++;
+      } else {
+        console.error("WebSocket connection failed after maximum attempts.");
+      }
+    };
+
+    ws.onmessage = event => {
+      const data = JSON.parse(event.data).data;
+      let item = streamInfoCache.list.find(element => element.id === data.id);
+      if (item) {
+        item.status.playerCount = data.status.playerCount;
+      }
+    };
+  }
+
   onMounted(async () => {
     treeLoading.value = true;
     fetchAll();
+    connectWebSocket();
   });
 
+  onBeforeUnmount(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      // 使用状态码 1000（正常关闭）和一个原因
+      ws.close();
+    }
+  });
   return {
     form,
     detailVisible,
