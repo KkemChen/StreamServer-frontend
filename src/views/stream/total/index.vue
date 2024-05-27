@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ref, watch, nextTick } from "vue";
 import tree from "./tree.vue";
 import { useUser } from "./utils/hook";
@@ -15,6 +15,7 @@ import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 import Play from "@iconify-icons/ri/play-circle-line";
 import Info from "@iconify-icons/ri/information-line";
+import * as Elicon from "@element-plus/icons-vue";
 
 // import flvjs from "flv.js";
 import mpegts from "mpegts.js";
@@ -49,6 +50,8 @@ const {
   onTreeSelect,
   handleUpdate,
   handleDelete,
+  downloadTemplate,
+  selectFile,
   handleUpload,
   handleReset,
   handleRole,
@@ -56,7 +59,8 @@ const {
   onSelectionCancel,
   handleCurrentChange,
   handleSelectionChange,
-  handleOpenDetail
+  uploadLoading,
+  handleOpenDetail,
 } = useUser(tableRef, treeRef);
 
 const playDialogVisible = ref(false);
@@ -135,25 +139,25 @@ const play = (id: String) => {
         <el-form-item label="名称" prop="cameraName">
           <el-input
             v-model="form.name"
-            placeholder="请输入名称"
-            clearable
             class="!w-[180px]"
+            clearable
+            placeholder="请输入名称"
           />
         </el-form-item>
         <el-form-item label="ID" prop="id">
           <el-input
             v-model="form.id"
-            placeholder="请输入ID"
-            clearable
             class="!w-[180px]"
+            clearable
+            placeholder="请输入ID"
           />
         </el-form-item>
         <el-form-item label="IP" prop="ip">
           <el-input
             v-model="form.ip"
-            placeholder="请输入IP地址"
-            clearable
             class="!w-[180px]"
+            clearable
+            placeholder="请输入IP地址"
           >
             <el-option label="已开启" value="1" />
             <el-option label="已关闭" value="0" />
@@ -161,9 +165,9 @@ const play = (id: String) => {
         </el-form-item>
         <el-form-item>
           <el-button
-            type="primary"
             :icon="useRenderIcon('ri:search-line')"
             :loading="loading"
+            type="primary"
             @click="onSearch(form)"
           >
             搜索
@@ -175,14 +179,31 @@ const play = (id: String) => {
       </el-form>
 
       <PureTableBar
-        title="ivss_stream_info"
         :columns="columns"
+        title="ivss_stream_info"
         @refresh="fetchAll"
       >
         <template #buttons>
           <el-button
+            :icon="Elicon.Download"
             type="primary"
+            @click="downloadTemplate()"
+          >
+            下载导入模板
+          </el-button>
+          <el-button :icon="Elicon.Upload" :disabled="uploadLoading" :loading="uploadLoading" type="primary" @click="selectFile()">
+            批量导入
+          </el-button>
+          <el-button
+            :icon="Elicon.Download"
+            type="primary"
+            @click="openDialog()"
+          >
+            批量导出
+          </el-button>
+          <el-button
             :icon="useRenderIcon(AddFill)"
+            type="primary"
             @click="openDialog()"
           >
             新增
@@ -196,18 +217,18 @@ const play = (id: String) => {
           >
             <div class="flex-auto">
               <span
-                style="font-size: var(--el-font-size-base)"
                 class="text-[rgba(42,46,54,0.5)] dark:text-[rgba(220,220,242,0.5)]"
+                style="font-size: var(--el-font-size-base)"
               >
                 已选 {{ selectedNum }} 项
               </span>
-              <el-button type="primary" text @click="onSelectionCancel">
+              <el-button text type="primary" @click="onSelectionCancel">
                 取消选择
               </el-button>
             </div>
             <el-popconfirm title="是否确认删除?" @confirm="onbatchDel">
               <template #reference>
-                <el-button type="danger" text class="mr-1">
+                <el-button class="mr-1" text type="danger">
                   批量删除
                 </el-button>
               </template>
@@ -215,69 +236,69 @@ const play = (id: String) => {
           </div>
           <pure-table
             ref="tableRef"
-            row-key="id"
-            adaptive
             :adaptiveConfig="{ offsetBottom: 108 }"
-            align-whole="center"
-            table-layout="auto"
-            :loading="loading"
-            :size="size"
-            :data="dataList"
             :columns="dynamicColumns"
-            :pagination="pagination"
-            :paginationSmall="size === 'small' ? true : false"
+            :data="dataList"
             :header-cell-style="{
               background: 'var(--el-fill-color-light)',
               color: 'var(--el-text-color-primary)'
             }"
+            :loading="loading"
+            :pagination="pagination"
+            :paginationSmall="size === 'small' ? true : false"
+            :size="size"
+            adaptive
+            align-whole="center"
+            row-key="id"
+            table-layout="auto"
             @selection-change="handleSelectionChange"
             @page-size-change="handleSizeChange"
             @page-current-change="handleCurrentChange"
           >
             <template #operation="{ row }">
               <el-button
+                :icon="useRenderIcon(Play)"
+                :size="size"
                 class="reset-margin"
                 link
                 type="primary"
-                :size="size"
-                :icon="useRenderIcon(Play)"
                 @click="play(row.id)"
               >
                 预览
               </el-button>
               <el-button
+                :icon="useRenderIcon(EditPen)"
+                :size="size"
                 class="reset-margin"
                 link
                 type="primary"
-                :size="size"
-                :icon="useRenderIcon(EditPen)"
                 @click="openDialog('修改', row)"
               >
                 修改
               </el-button>
               <el-popconfirm
                 :title="`是否确认删除用户编号为${row.id}的这条数据`"
-                @confirm="handleDelete(row)"
                 :width="200"
+                @confirm="handleDelete(row)"
               >
                 <template #reference>
                   <el-button
+                    :icon="useRenderIcon(Delete)"
+                    :size="size"
                     class="reset-margin"
                     link
                     type="primary"
-                    :size="size"
-                    :icon="useRenderIcon(Delete)"
                   >
                     删除
                   </el-button>
                 </template>
               </el-popconfirm>
               <el-button
+                :icon="useRenderIcon(Info)"
+                :size="size"
                 class="reset-margin"
                 link
                 type="primary"
-                :size="size"
-                :icon="useRenderIcon(Info)"
                 @click="handleOpenDetail(row)"
               >
                 详情
@@ -339,12 +360,12 @@ const play = (id: String) => {
       </PureTableBar>
     </div>
     <!-- <Detail :visible="detailVisible" /> -->
-    <el-drawer v-model="detailVisible" title="详情" size="50%">
+    <el-drawer v-model="detailVisible" size="50%" title="详情">
       <template #header>
         <h3>详情</h3>
       </template>
       <div>
-        <el-descriptions :column="1" class="h-systemInfo" border>
+        <el-descriptions :column="1" border class="h-systemInfo">
           <el-descriptions-item
             v-for="item in detailInfo"
             class-name="system-content"
@@ -366,12 +387,12 @@ const play = (id: String) => {
       :show-close="false"
       title=""
     >
-      <div id="dplayer"></div>
+      <div id="dplayer" />
     </el-dialog>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 :deep(.el-dropdown-menu__item i) {
   margin: 0;
 }
@@ -389,10 +410,12 @@ const play = (id: String) => {
     margin-bottom: 12px;
   }
 }
+
 .h-systemInfo {
   margin-left: 18px;
   height: 216px;
 }
+
 @-moz-document url-prefix() {
   .h-systemInfo {
     height: auto;
@@ -416,9 +439,11 @@ const play = (id: String) => {
   max-width: 50%;
   width: 45%;
   padding: 0;
+
   .el-dialog__header {
     padding: 0;
   }
+
   // #player {
   //   max-width: 100%;
   //   width: 100%;

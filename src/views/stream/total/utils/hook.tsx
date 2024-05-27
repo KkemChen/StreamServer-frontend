@@ -1,5 +1,6 @@
 import "./reset.css";
 import dayjs from "dayjs";
+import * as XLSX from 'xlsx'
 import { onBeforeUnmount } from "vue";
 import roleForm from "../form/role.vue";
 import editForm from "../form/index.vue";
@@ -41,7 +42,6 @@ const streamTypes = {
   1: "主码流",
   2: "子码流"
 };
-
 const detailInfo = reactive({
   name: { label: "名称", value: "" },
   id: { label: "ID", value: "" },
@@ -114,6 +114,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const ruleFormRef = ref();
   const dataList = ref([]);
   const loading = ref(true);
+  const uploadLoading = ref(false);
   // 上传头像信息
   const avatarInfo = ref();
   const switchLoadMap = ref({});
@@ -135,6 +136,11 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       type: "selection",
       fixed: "left",
       reserveSelection: true // 数据刷新后保留选项
+    },
+    {
+      label: "序号",
+      type: "index",
+      minWidth: 120
     },
     {
       label: "名称",
@@ -481,6 +487,102 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     return newTreeList;
   }
 
+  function downloadTemplate() {
+    window.open("/流媒体导入模板.xlsx", "_blank");
+  }
+
+  const fileType = [".xlsx", ".xls"];
+
+  function selectFile() {
+    let ipt = document.createElement("input");
+    ipt.setAttribute("type", "file");
+    ipt.setAttribute("accept", fileType.join());
+    ipt.onchange = async (e: any) => {
+      let files = [...e.target.files]
+      let flag = validataFile(files, fileType, 1024 * 1024 * 100)
+      if (flag) {
+        uploadLoading.value = true
+        analysisData(files.at(0)).then(data => {
+          // 调接口
+          debugger
+        }).catch(err => {
+          message(err.message, {
+            type: "error"
+          });
+        }).finally(() => {
+          uploadLoading.value = false
+        })
+      }
+      else {
+        message(`请选择后缀为${fileType.join()}的文件`, {
+          type: "error"
+        });
+      }
+    };
+    ipt.click();
+  }
+  function downloadData(ids:Array<String>){ }
+  //size单位为byte
+  function validataFile(files: Array<File>, type: Array<String>, size: Number): Boolean {
+    return files.every(item => {
+      let fileType = item.name.match(/\.\w+$/g);
+      if (fileType.length > 0) {
+        return type.includes(fileType[0])
+      }
+      else {
+        return false
+      }
+    });
+  }
+
+  function analysisData(file: File) {
+    return new Promise((yes, no) => {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        // 假设我们只读取第一个工作表
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        let flag: any = validataSheet(jsonData)
+        if (flag >= 0) {
+          no(new Error(`您的第${flag}条数据有误，请确认后重新导入`))
+        }
+        else {
+          yes(jsonData)
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    })
+  }
+  function validataSheet(list: Array<Object>): Number {
+    let index: Number = -1
+    let maps = {
+      streamTypes: Object.values(streamTypes),
+      streamModes: Object.values(streamModes).map(v => v.mode),
+      vendors: Object.values(vendorImages).map(v => v.name),
+    }
+    for (let i: any = 0; i < list.length; i++) {
+      let item = list[0]
+      let streamType = item['码流类型']
+      let streamMode = item['取流模式']
+      let vendor = item['设备厂商']
+      let has = maps.streamTypes.includes(streamType) &&
+        maps.streamModes.includes(streamMode) &&
+        maps.vendors.includes(vendor)
+      if (has) {
+        continue
+      }
+      else {
+        index = i
+        break
+      }
+    }
+    return index
+  }
+
   function openDialog(title = "新增", row?: FormItemProps) {
     addDialog({
       title: `${title}用户`,
@@ -509,6 +611,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       beforeSure: async (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
+
         function chores() {
           message(`您${title}了用户名称为${curData.id}的这条数据`, {
             type: "success"
@@ -516,6 +619,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           done(); // 关闭弹框
           fetchAll(); // 刷新表格数据
         }
+
         FormRef.validate(async valid => {
           if (valid) {
             console.log("curData", curData);
@@ -536,6 +640,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   }
 
   const cropRef = ref();
+
   /** 上传头像 */
   function handleUpload(row) {
     addDialog({
@@ -698,6 +803,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   };
 
   let ws;
+
   async function connectWebSocket() {
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 5; // 最大重连尝试次数
@@ -747,6 +853,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     detailVisible,
     detailInfo,
     loading,
+    uploadLoading,
     columns,
     dataList,
     treeData,
@@ -760,6 +867,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     resetForm,
     onbatchDel,
     openDialog,
+    downloadTemplate,
+    selectFile,
     onTreeSelect,
     handleUpdate,
     handleDelete,
