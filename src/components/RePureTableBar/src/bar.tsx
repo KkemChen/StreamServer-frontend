@@ -33,6 +33,10 @@ const props = {
   isExpandAll: {
     type: Boolean,
     default: true
+  },
+  border: {
+    type: Boolean,
+    default: false
   }
 };
 
@@ -46,11 +50,11 @@ export default defineComponent({
     const checkAll = ref(true);
     const isIndeterminate = ref(false);
     const isExpandAll = ref(props.isExpandAll);
-    const filterColumns = cloneDeep(props?.columns).filter(column =>
-      isBoolean(column?.hide)
+    let filterColumns = cloneDeep(props?.columns).filter(column => {
+      return isBoolean(column?.hide)
         ? !column.hide
-        : !(isFunction(column?.hide) && column?.hide())
-    );
+        : !(isFunction(column?.hide) && column?.hide());
+    });
     let checkColumnList = getKeyList(cloneDeep(props?.columns), "label");
     const checkedColumns = ref(getKeyList(cloneDeep(filterColumns), "label"));
     const dynamicColumns = ref(cloneDeep(props?.columns));
@@ -118,6 +122,7 @@ export default defineComponent({
     }
 
     function handleCheckedColumnsChange(value: string[]) {
+      localStorage.setItem("streamHideCol", JSON.stringify(value));
       checkedColumns.value = value;
       const checkedCount = value.length;
       checkAll.value = checkedCount === checkColumnList.length;

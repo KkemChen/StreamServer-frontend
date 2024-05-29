@@ -1,4 +1,4 @@
-import { http } from "@/utils/http";
+import {http} from "@/utils/http";
 
 type Result = {
   success: boolean;
@@ -25,17 +25,25 @@ type ResultTable = {
 
 /** 获取全部流信息 */
 export const getStreamInfo = (data?: object) => {
-  return http.request<ResultTable>("post", "/api/v1/stream/info", { data });
+  return http.request<ResultTable>("post", "/api/v1/stream/info", {data});
 };
 
 /** 新增一个流 */
 export const addStreamInfo = (data?: object) => {
-  return http.request<Result>("post", "/api/v1/stream/add", { data });
+  return http.request<Result>("post", "/api/v1/stream/add", {data});
+};
+/** 新增n个流 */
+export const batchAddStreamInfo = (data?: object) => {
+  return http.request<Result>("post", "/api/v1/stream/addBatch", {data});
 };
 
 /** 删除一个流 */
 export const delStreamInfo = (data?: object) => {
-  return http.request<Result>("post", "/api/v1/stream/del", { data });
+  return http.request<Result>("post", "/api/v1/stream/del", {data});
+};
+/** 删除n个流 */
+export const batchDelStreamInfo = (data?: object) => {
+  return http.request<Result>("post", "/api/v1/stream/delBatch", {data});
 };
 // /** 系统管理-用户管理-获取所有角色列表 */
 // export const getAllRoleList = () => {

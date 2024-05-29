@@ -30,6 +30,7 @@ const formRef = ref();
 const tableRef = ref();
 
 const {
+  downloadData,
   form,
   detailVisible,
   detailInfo,
@@ -60,7 +61,7 @@ const {
   handleCurrentChange,
   handleSelectionChange,
   uploadLoading,
-  handleOpenDetail,
+  handleOpenDetail
 } = useUser(tableRef, treeRef);
 
 const playDialogVisible = ref(false);
@@ -191,13 +192,19 @@ const play = (id: String) => {
           >
             下载导入模板
           </el-button>
-          <el-button :icon="Elicon.Upload" :disabled="uploadLoading" :loading="uploadLoading" type="primary" @click="selectFile()">
+          <el-button
+            :disabled="uploadLoading"
+            :icon="Elicon.Upload"
+            :loading="uploadLoading"
+            type="primary"
+            @click="selectFile()"
+          >
             批量导入
           </el-button>
           <el-button
             :icon="Elicon.Download"
             type="primary"
-            @click="openDialog()"
+            @click="downloadData()"
           >
             批量导出
           </el-button>
@@ -239,6 +246,7 @@ const play = (id: String) => {
             :adaptiveConfig="{ offsetBottom: 108 }"
             :columns="dynamicColumns"
             :data="dataList"
+            border
             :header-cell-style="{
               background: 'var(--el-fill-color-light)',
               color: 'var(--el-text-color-primary)'

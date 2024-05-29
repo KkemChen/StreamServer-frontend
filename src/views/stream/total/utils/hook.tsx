@@ -1,6 +1,8 @@
 import "./reset.css";
 import dayjs from "dayjs";
-import * as XLSX from 'xlsx'
+import * as XLSX from "xlsx";
+
+console.log(XLSX);
 import { onBeforeUnmount } from "vue";
 import roleForm from "../form/role.vue";
 import editForm from "../form/index.vue";
@@ -70,7 +72,9 @@ import {
   // getDeptList,
   getStreamInfo,
   addStreamInfo,
-  delStreamInfo
+  delStreamInfo,
+  batchAddStreamInfo,
+  batchDelStreamInfo
   // getAllRoleList
 } from "@/api/stream";
 import {
@@ -130,6 +134,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     background: true,
     pageSizes: [10, 20, 50, 100]
   });
+  let hideCol = localStorage.getItem("streamHideCol");
+  hideCol = JSON.parse(hideCol || "[]");
   const columns: TableColumnList = [
     {
       label: "勾选列", // 如果需要表格多选，此处label必须设置
@@ -159,6 +165,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     },
     {
       hide: true,
+      resizable: true,
       label: "Url",
       prop: "url",
       minWidth: 130,
@@ -295,7 +302,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       width: 300,
       slot: "operation"
     }
-  ];
+  ].map(v => ({
+    ...v,
+    hide: !hideCol.includes(v.label)
+  }));
   const buttonClass = computed(() => {
     return [
       "!h-[20px]",
@@ -402,7 +412,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     // 返回当前选中的行
     const curSelected = tableRef.value.getTableRef().getSelectionRows();
     // 接下来根据实际业务，通过选中行的某项数据，比如下面的id，调用接口进行批量删除
-    await delStreamInfo(curSelected);
+    await batchDelStreamInfo(curSelected);
     message(`已删除ID为 ${getKeyList(curSelected, "id")} 的数据`, {
       type: "success"
     });
@@ -498,22 +508,27 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     ipt.setAttribute("type", "file");
     ipt.setAttribute("accept", fileType.join());
     ipt.onchange = async (e: any) => {
-      let files = [...e.target.files]
-      let flag = validataFile(files, fileType, 1024 * 1024 * 100)
+      let files = [...e.target.files];
+      let flag = validataFile(files, fileType, 1024 * 1024 * 100);
       if (flag) {
-        uploadLoading.value = true
-        analysisData(files.at(0)).then(data => {
-          // 调接口
-          debugger
-        }).catch(err => {
-          message(err.message, {
-            type: "error"
+        analysisData(files.at(0))
+          .then(async (data: Array<Object>) => {
+            // 调接口
+            uploadLoading.value = true;
+            let formatDt = formatData(data);
+
+            let res: Object = await batchAddStreamInfo(formatDt);
+            if (res.code === 0) {
+              fetchAll();
+            }
+            uploadLoading.value = false;
+          })
+          .catch(err => {
+            message(err.message, {
+              type: "error"
+            });
           });
-        }).finally(() => {
-          uploadLoading.value = false
-        })
-      }
-      else {
+      } else {
         message(`请选择后缀为${fileType.join()}的文件`, {
           type: "error"
         });
@@ -521,16 +536,79 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     };
     ipt.click();
   }
-  function downloadData(ids:Array<String>){ }
+
+  function formatData(list: Array<Object>) {
+    return list.map(v => {
+      let vendor = v["设备厂商"];
+      let streamMode = v["取流模式"];
+      let streamType = v["码流类型"];
+      // 根据值来找key
+      for (let key in streamModes) {
+        if (streamMode === streamModes[key].mode) {
+          streamMode = ~~key;
+          break;
+        }
+      }
+      for (let key in streamTypes) {
+        if (streamType === streamTypes[key]) {
+          streamType = ~~key;
+          break;
+        }
+      }
+      for (let key in vendorImages) {
+        if (vendor === vendorImages[key].name) {
+          vendor = ~~key;
+          break;
+        }
+      }
+      return {
+        // "title": "修改",
+        id: `${v["视频流ID"] || ""}`,
+        name: `${v["视频流名称"] || ""}`,
+        streamMode: streamMode,
+        vendor: vendor,
+        streamType: streamType,
+        ip: v["ip地址"],
+        url: v["取流地址"],
+        status: {
+          live: false,
+          playerCount: 0
+        }
+      };
+    });
+  }
+
+  function downloadData(ids: Array<String>) {
+    // 返回当前选中的行
+    let curSelected = tableRef.value.getTableRef().getSelectionRows();
+    if (curSelected.length === 0) {
+      curSelected = dataList.value;
+      // tableRef.value.getTableRef().clearSelection();
+    }
+    let worksheet = XLSX.utils.json_to_sheet(curSelected);
+    // {
+    //   header: ['视频流名称', 'ip地址', '码流类型', '设备厂商', '取流模式', '取流地址'],
+    //     skipHeader: true
+    // }
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, "dasds.xlsx");
+    // const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  }
+
   //size单位为byte
-  function validataFile(files: Array<File>, type: Array<String>, size: Number): Boolean {
+  function validataFile(
+    files: Array<File>,
+    type: Array<String>,
+    size: Number
+  ): Boolean {
     return files.every(item => {
       let fileType = item.name.match(/\.\w+$/g);
       if (fileType.length > 0) {
-        return type.includes(fileType[0])
-      }
-      else {
-        return false
+        return type.includes(fileType[0]);
+      } else {
+        return false;
       }
     });
   }
@@ -540,47 +618,45 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
+        const workbook = XLSX.read(data, { type: "array" });
 
         // 假设我们只读取第一个工作表
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
-        let flag: any = validataSheet(jsonData)
+        let flag: any = validateSheet(jsonData);
         if (flag >= 0) {
-          no(new Error(`您的第${flag}条数据有误，请确认后重新导入`))
-        }
-        else {
-          yes(jsonData)
+          no(new Error(`您的第${flag}条数据有误，请确认后重新导入`));
+        } else {
+          yes(jsonData);
         }
       };
       reader.readAsArrayBuffer(file);
-    })
+    });
   }
-  function validataSheet(list: Array<Object>): Number {
-    let index: Number = -1
+
+  function validateSheet(list: Array<Object>): Number {
+    let index: Number = -1;
     let maps = {
       streamTypes: Object.values(streamTypes),
       streamModes: Object.values(streamModes).map(v => v.mode),
-      vendors: Object.values(vendorImages).map(v => v.name),
-    }
+      vendors: Object.values(vendorImages).map(v => v.name)
+    };
     for (let i: any = 0; i < list.length; i++) {
-      let item = list[0]
-      let streamType = item['码流类型']
-      let streamMode = item['取流模式']
-      let vendor = item['设备厂商']
-      let has = maps.streamTypes.includes(streamType) &&
+      let item = list[0];
+      let streamType = item["码流类型"];
+      let streamMode = item["取流模式"];
+      let vendor = item["设备厂商"];
+      let has =
+        maps.streamTypes.includes(streamType) &&
         maps.streamModes.includes(streamMode) &&
-        maps.vendors.includes(vendor)
-      if (has) {
-        continue
-      }
-      else {
-        index = i
-        break
+        maps.vendors.includes(vendor);
+      if (!has) {
+        index = i;
+        break;
       }
     }
-    return index
+    return index;
   }
 
   function openDialog(title = "新增", row?: FormItemProps) {
@@ -624,6 +700,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           if (valid) {
             console.log("curData", curData);
             // 表单规则校验通过
+            debugger;
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
               await addStreamInfo(curData);
@@ -879,6 +956,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     onSelectionCancel,
     handleCurrentChange,
     handleSelectionChange,
-    handleOpenDetail
+    handleOpenDetail,
+    downloadData
   };
 }
