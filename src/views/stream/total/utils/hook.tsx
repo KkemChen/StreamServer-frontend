@@ -2,7 +2,6 @@ import "./reset.css";
 import dayjs from "dayjs";
 import * as XLSX from "xlsx";
 
-console.log(XLSX);
 import { onBeforeUnmount } from "vue";
 import roleForm from "../form/role.vue";
 import editForm from "../form/index.vue";
@@ -119,6 +118,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const dataList = ref([]);
   const loading = ref(true);
   const uploadLoading = ref(false);
+  const exportFiledsDialog = ref(false);
   // 上传头像信息
   const avatarInfo = ref();
   const switchLoadMap = ref({});
@@ -136,7 +136,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   });
   let hideCol = localStorage.getItem("streamHideCol");
   hideCol = JSON.parse(hideCol || "[]");
-  const columns: TableColumnList = [
+  let columns: TableColumnList = [
     {
       label: "勾选列", // 如果需要表格多选，此处label必须设置
       type: "selection",
@@ -270,20 +270,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         );
       }
     },
-    // {
-    //   label: "CreateTime",
-    //   minWidth: 90,
-    //   prop: "createTime",
-    //   formatter: ({ createTime }) =>
-    //     dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
-    // },
-    // {
-    //   label: "UpdateTime",
-    //   minWidth: 90,
-    //   prop: "updateTime",
-    //   formatter: ({ createTime }) =>
-    //     dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
-    // },
     {
       hide: true,
       label: "创建时间",
@@ -302,10 +288,35 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       width: 300,
       slot: "operation"
     }
-  ].map(v => ({
-    ...v,
-    hide: !hideCol.includes(v.label)
-  }));
+  ]
+  const exportFileds: any = ref(columns.slice(2, -1))
+  const checkedFileds: any = ref(exportFileds.value.map(v => v.prop))
+  exportFileds.value.push({
+    label: 'hls',
+    prop: 'hls'
+  }, {
+    label: 'http_fmp4',
+    prop: 'http_fmp4'
+  }, {
+    label: 'http_flv',
+    prop: 'http_flv'
+  }, {
+    label: 'rtmp',
+    prop: 'rtmp'
+  }, {
+    label: 'rtsp',
+    prop: 'rtsp',
+  })
+  checkedFileds.value.push('rtsp')
+
+  if (hideCol.length > 0) {
+    columns = columns.map(v => {
+      return {
+        ...v,
+        hide: !hideCol.includes(v.label)
+      }
+    });
+  }
   const buttonClass = computed(() => {
     return [
       "!h-[20px]",
@@ -373,24 +384,20 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   } */
 
   function handleUpdate(row) {
-    console.log(row);
   }
 
   async function handleDelete(row) {
     message(`您删除了ID: ${row.id}的这条数据`, { type: "success" });
-    console.log(toRaw(row));
     await delStreamInfo(toRaw(row));
     fetchAll();
   }
 
   function handleSizeChange(val: number) {
     handlePagination();
-    console.log(`${val} items per page`);
   }
 
   function handleCurrentChange(val: number) {
     handlePagination();
-    console.log(`current page: ${val}`);
   }
 
   /** 当CheckBox选择项发生变化时会触发该事件 */
@@ -431,7 +438,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   async function fetchAll() {
     loading.value = true;
     const { data } = await getStreamInfo({});
-    // console.log(data);
     streamInfoCache.list = data.list;
     streamInfo.list = data.list;
     pagination.total = data.total;
@@ -498,6 +504,12 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   }
 
   function downloadTemplate() {
+    // let worksheet = XLSX.utils.aoa_to_sheet([
+    //   ['视频流名称', 'ip地址', '码流类型', '设备厂商', '取流模式', '取流地址']
+    // ]);
+    // const workbook = XLSX.utils.book_new();
+    // XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    // XLSX.writeFile(workbook, "流媒体导入模板.xlsx");
     window.open("/流媒体导入模板.xlsx", "_blank");
   }
 
@@ -516,8 +528,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
             // 调接口
             uploadLoading.value = true;
             let formatDt = formatData(data);
-
-            let res: Object = await batchAddStreamInfo(formatDt);
+            let res: any = await batchAddStreamInfo(formatDt);
             if (res.code === 0) {
               fetchAll();
             }
@@ -578,23 +589,54 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     });
   }
 
-  function downloadData(ids: Array<String>) {
+  function downloadData() {
     // 返回当前选中的行
     let curSelected = tableRef.value.getTableRef().getSelectionRows();
     if (curSelected.length === 0) {
       curSelected = dataList.value;
       // tableRef.value.getTableRef().clearSelection();
     }
-    let worksheet = XLSX.utils.json_to_sheet(curSelected);
-    // {
-    //   header: ['视频流名称', 'ip地址', '码流类型', '设备厂商', '取流模式', '取流地址'],
-    //     skipHeader: true
-    // }
-
+    const ip = `${import.meta.env.VITE_APP_BASE_IP ? import.meta.env.VITE_APP_BASE_IP : window.location.hostname}`;
+    let expordData = curSelected.map(v => {
+      let dt = {}
+      checkedFileds.value.forEach(key => {
+        if (key === 'rtsp') {
+          dt[key] = `rtsp://${ip}:554/live/${v.id}`;
+        }
+        else if (key === 'rtmp') {
+          dt[key] = `rtmp://${ip}:2935/live/${v.id}`;
+        }
+        else if (key === 'http_flv') {
+          dt[key] = `http://${ip}:8096/live/${v.id}.live.flv`;
+        }
+        else if (key === 'http_fmp4') {
+          dt[key] = `http://${ip}:8096/live/${v.id}.lvie.mp4`;
+        }
+        else if (key === 'hls') {
+          dt[key] = `http://${ip}:8096/live/${v.id}/hls.m3u8`;
+        }
+        else if (key === 'streamMode') {
+          dt['取流模式'] = streamModes[v[key]]?.mode || '';
+        }
+        else if (key === 'streamType') {
+          dt['码流类型'] = streamTypes[v[key]] || '';
+        }
+        else if (key === 'vendor') {
+          dt['设备厂商'] = vendorImages[v[key]]?.name || '';
+        }
+        else {
+          let mapKey = exportFileds.value.find(item => item.prop === key)
+          if (mapKey) {
+            dt[mapKey.label] = v[key]
+          }
+        }
+      })
+      return dt
+    })
+    let worksheet = XLSX.utils.json_to_sheet(expordData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "dasds.xlsx");
-    // const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    XLSX.writeFile(workbook, `流媒体数据${Date.now()}.xlsx`);
   }
 
   //size单位为byte
@@ -643,14 +685,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       vendors: Object.values(vendorImages).map(v => v.name)
     };
     for (let i: any = 0; i < list.length; i++) {
-      let item = list[0];
+      let item = list[i];
       let streamType = item["码流类型"];
       let streamMode = item["取流模式"];
       let vendor = item["设备厂商"];
       let has =
         maps.streamTypes.includes(streamType) &&
         maps.streamModes.includes(streamMode) &&
-        maps.vendors.includes(vendor);
+        maps.vendors.includes(vendor) && item['视频流ID'] && item['取流地址'];
       if (!has) {
         index = i;
         break;
@@ -698,7 +740,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
 
         FormRef.validate(async valid => {
           if (valid) {
-            console.log("curData", curData);
             // 表单规则校验通过
             debugger;
             if (title === "新增") {
@@ -733,7 +774,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           onCropper: info => (avatarInfo.value = info)
         }),
       beforeSure: done => {
-        console.log("裁剪后的图片信息：", avatarInfo.value);
         // 根据实际业务使用avatarInfo.value和row里的某些字段去调用上传头像接口即可
         done(); // 关闭弹框
         fetchAll(); // 刷新表格数据
@@ -812,7 +852,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
             message(`已成功重置 ${row.username} 用户的密码`, {
               type: "success"
             });
-            console.log(pwdForm.newPwd);
             // 根据实际业务使用pwdForm.newPwd和row里的某些字段去调用重置用户密码接口即可
             done(); // 关闭弹框
             fetchAll(); // 刷新表格数据
@@ -844,7 +883,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       contentRenderer: () => h(roleForm),
       beforeSure: (done, { options }) => {
         const curData = options.props.formInline as RoleFormItemProps;
-        console.log("curIds", curData.ids);
         // 根据实际业务使用curData.ids和row里的某些字段去调用修改角色接口即可
         done(); // 关闭弹框
       }
@@ -852,7 +890,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   }
 
   const handleOpenDetail = row => {
-    // console.log("click", columnsDetail);
     const ip = `${import.meta.env.VITE_APP_BASE_IP ? import.meta.env.VITE_APP_BASE_IP : window.location.hostname}`;
     detailInfo["name"].value = row.name;
     detailInfo["id"].value = row.id;
@@ -890,17 +927,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     );
 
     ws.onopen = () => {
-      console.log("WebSocket connection success");
       reconnectAttempts = 0; // 重置重连尝试次数
     };
 
     ws.onerror = event => {
-      console.log("WebSocket connection error", event);
       if (reconnectAttempts < maxReconnectAttempts) {
         setTimeout(connectWebSocket, 5000 * reconnectAttempts); // 使用指数回退策略增加重连延迟
         reconnectAttempts++;
       } else {
-        console.error("WebSocket connection failed after maximum attempts.");
       }
     };
 
@@ -931,6 +965,9 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     detailInfo,
     loading,
     uploadLoading,
+    exportFileds,
+    checkedFileds,
+    exportFiledsDialog,
     columns,
     dataList,
     treeData,

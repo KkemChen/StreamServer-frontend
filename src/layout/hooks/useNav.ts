@@ -91,7 +91,7 @@ export function useNav() {
   }
 
   function resolvePath(route) {
-    if (!route.children) return console.error(errorInfo);
+    if (!route.children) return;
     const httpReg = /^http(s?):\/\//;
     const routeChildPath = route.children[0]?.path;
     if (httpReg.test(routeChildPath)) {

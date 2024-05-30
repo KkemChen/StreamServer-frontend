@@ -8,11 +8,9 @@ const sshConnect = async (host, port, user, password) => {
       password: password,
     });
 
-    console.log('SSH connection initialized', response);
     const data = JSON.parse(response);
     return data;
   } catch (error) {
-    console.error('Error in SSH connection:', error);
     throw error;
   }
 };
@@ -23,10 +21,8 @@ const disconnectSsh = async (host, port) => {
       host: `${host}:${port}`,
     });
 
-    console.log('Disconnect ssh success: ', response);
     return response;
   } catch (error) {
-    console.error('Disconnect ssh failed: ', error);
     throw error;
   }
 };

@@ -72,9 +72,7 @@ const getDiskUsage = diskData => {
 };
 
 const getRemoteInfo = async () => {
-  console.log("start");
   await globalStore.getSystemInfo();
-  console.log(globalStore);
   cpuInfo.value = globalStore.systemInfo.cpuInfo;
   // cpu 进度表
   cpuTableData.value = globalStore.systemInfo.cpuDetail;

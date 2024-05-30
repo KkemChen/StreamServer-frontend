@@ -96,7 +96,6 @@ onMounted(() => {
 
   connectWebSocket();
   ws.onopen = () => {
-    console.log("WebSocket connection success");
 
     asciiArt.forEach(line => {
       term.writeln(line); // 逐行输出
@@ -106,12 +105,10 @@ onMounted(() => {
   };
 
   ws.onerror = event => {
-    console.log("WebSocket connection error", event);
     if (reconnectAttempts < maxReconnectAttempts) {
       setTimeout(connectWebSocket, 5000 * reconnectAttempts); // 使用指数回退策略增加重连延迟
       reconnectAttempts++;
     } else {
-      console.error("WebSocket connection failed after maximum attempts.");
     }
   };
 
@@ -122,7 +119,6 @@ onMounted(() => {
   };
 
   // ws.onclose = event => {
-  //   console.log("WebSocket connection closed", event);
   //   // 可选：在这里处理非正常关闭情况下的重连逻辑
   //   if (!event.wasClean && reconnectAttempts < maxReconnectAttempts) {
   //     setTimeout(connectWebSocket, 5000 * reconnectAttempts); // 使用指数回退策略增加重连延迟

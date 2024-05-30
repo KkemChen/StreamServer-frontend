@@ -179,7 +179,6 @@ Print.prototype = {
         frameWindow.close();
       }, 10);
     } catch (err) {
-      console.error(err);
     }
   },
   isDOM:

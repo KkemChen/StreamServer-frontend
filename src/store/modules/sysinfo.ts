@@ -99,7 +99,6 @@ export const useGlobalStore = defineStore({
       if (this.isConnected) {
         const requestUrl = `${this.remoteConfig.host}:${this.remoteConfig.port}`;
         const res = await fetchRemoteAllInfo(requestUrl);
-        console.log(res);
         this.systemInfo.cpuInfo = res.cpu_info;
         this.systemInfo.cpuDetail = res.cpu_detail;
         this.systemInfo.memoryInfo = res.mem_info;
@@ -111,7 +110,6 @@ export const useGlobalStore = defineStore({
         this.systemInfo.gpuDetail = res.gpu_detail;
       }
       const res = await fetchRemoteAllInfo("test");
-      console.log(res);
       this.systemInfo.cpuInfo = res.cpu_info;
       this.systemInfo.cpuDetail = res.cpu_detail;
       this.systemInfo.memoryInfo = res.mem_info;

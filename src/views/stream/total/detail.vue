@@ -8,7 +8,6 @@ import {
   PlusDrawerForm
 } from "plus-pro-components";
 import { watch } from "fs";
-import { log } from "console";
 
 const columns: PlusColumn[] = [
   {
@@ -65,7 +64,6 @@ let visible = ref(props.visible);
 
 watchEffect(() => {
   visible.value = props.visible;
-  console.log(`p: `, props.visible, visible.value);
 });
 // const visible = ref(true)
 const handleOpen = () => {

@@ -50,7 +50,6 @@ watch(
     try {
       state.data = JSON.parse(newVal);
     } catch (err) {
-      // console.log('JSON ERROR');
     }
   }
 );
@@ -61,7 +60,6 @@ watch(
     try {
       state.val = JSON.stringify(newVal);
     } catch (err) {
-      // console.log('JSON ERROR');
     }
   }
 );

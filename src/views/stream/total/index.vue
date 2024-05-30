@@ -61,6 +61,9 @@ const {
   handleCurrentChange,
   handleSelectionChange,
   uploadLoading,
+  checkedFileds,
+  exportFiledsDialog,
+  exportFileds,
   handleOpenDetail
 } = useUser(tableRef, treeRef);
 
@@ -204,7 +207,7 @@ const play = (id: String) => {
           <el-button
             :icon="Elicon.Download"
             type="primary"
-            @click="downloadData()"
+            @click="exportFiledsDialog=true"
           >
             批量导出
           </el-button>
@@ -397,10 +400,38 @@ const play = (id: String) => {
     >
       <div id="dplayer" />
     </el-dialog>
+    <!-- 选择需要导出的字段 -->
+    <el-dialog
+      id="player-dialog"
+      v-model="exportFiledsDialog"
+      :show-close="true"
+    >
+    <template #header>
+      <div class="dialogTitle">请选择需要导出的字段</div>
+    </template>
+    <div class="selectBody">
+      <el-checkbox-group v-model="checkedFileds">
+        <el-checkbox v-for="item in exportFileds"  :key="item.prop" :label="item.label" :value="item.prop" />
+      </el-checkbox-group>
+      <el-button size="large" type="primary" @click="downloadData()">开始导出</el-button>
+    </div>
+    </el-dialog>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.dialogTitle{
+  padding: 15px;
+  font-size: 15px;
+  color: #1f2329;
+  box-sizing: border-box;
+}
+.selectBody{
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 15px;
+}
 :deep(.el-dropdown-menu__item i) {
   margin: 0;
 }
