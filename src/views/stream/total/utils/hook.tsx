@@ -168,11 +168,11 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       resizable: true,
       label: "Url",
       prop: "url",
-      minWidth: 130,
+      minWidth: 150,
       cellRenderer: ({ row }) => (
         <div
           style={{
-            maxWidth: "130px", // 设置最大宽度
+            maxWidth: "150px", // 设置最大宽度
             whiteSpace: "nowrap", // 文本不换行
             overflow: "hidden", // 溢出部分隐藏
             textOverflow: "ellipsis" // 超出部分显示省略号
@@ -288,33 +288,39 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       width: 300,
       slot: "operation"
     }
-  ]
-  const exportFileds: any = ref(columns.slice(2, -1))
-  const checkedFileds: any = ref(exportFileds.value.map(v => v.prop))
-  exportFileds.value.push({
-    label: 'hls',
-    prop: 'hls'
-  }, {
-    label: 'http_fmp4',
-    prop: 'http_fmp4'
-  }, {
-    label: 'http_flv',
-    prop: 'http_flv'
-  }, {
-    label: 'rtmp',
-    prop: 'rtmp'
-  }, {
-    label: 'rtsp',
-    prop: 'rtsp',
-  })
-  checkedFileds.value.push('rtsp')
+  ];
+  const exportFileds: any = ref(columns.slice(2, -1));
+  const checkedFileds: any = ref(exportFileds.value.map(v => v.prop));
+  exportFileds.value.push(
+    {
+      label: "hls",
+      prop: "hls"
+    },
+    {
+      label: "http_fmp4",
+      prop: "http_fmp4"
+    },
+    {
+      label: "http_flv",
+      prop: "http_flv"
+    },
+    {
+      label: "rtmp",
+      prop: "rtmp"
+    },
+    {
+      label: "rtsp",
+      prop: "rtsp"
+    }
+  );
+  checkedFileds.value.push("rtsp");
 
   if (hideCol.length > 0) {
     columns = columns.map(v => {
       return {
         ...v,
         hide: !hideCol.includes(v.label)
-      }
+      };
     });
   }
   const buttonClass = computed(() => {
@@ -383,8 +389,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       });
   } */
 
-  function handleUpdate(row) {
-  }
+  function handleUpdate(row) {}
 
   async function handleDelete(row) {
     message(`您删除了ID: ${row.id}的这条数据`, { type: "success" });
@@ -598,41 +603,33 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     }
     const ip = `${import.meta.env.VITE_APP_BASE_IP ? import.meta.env.VITE_APP_BASE_IP : window.location.hostname}`;
     let expordData = curSelected.map(v => {
-      let dt = {}
+      let dt = {};
       checkedFileds.value.forEach(key => {
-        if (key === 'rtsp') {
+        if (key === "rtsp") {
           dt[key] = `rtsp://${ip}:554/live/${v.id}`;
-        }
-        else if (key === 'rtmp') {
+        } else if (key === "rtmp") {
           dt[key] = `rtmp://${ip}:2935/live/${v.id}`;
-        }
-        else if (key === 'http_flv') {
+        } else if (key === "http_flv") {
           dt[key] = `http://${ip}:8096/live/${v.id}.live.flv`;
-        }
-        else if (key === 'http_fmp4') {
+        } else if (key === "http_fmp4") {
           dt[key] = `http://${ip}:8096/live/${v.id}.lvie.mp4`;
-        }
-        else if (key === 'hls') {
+        } else if (key === "hls") {
           dt[key] = `http://${ip}:8096/live/${v.id}/hls.m3u8`;
-        }
-        else if (key === 'streamMode') {
-          dt['取流模式'] = streamModes[v[key]]?.mode || '';
-        }
-        else if (key === 'streamType') {
-          dt['码流类型'] = streamTypes[v[key]] || '';
-        }
-        else if (key === 'vendor') {
-          dt['设备厂商'] = vendorImages[v[key]]?.name || '';
-        }
-        else {
-          let mapKey = exportFileds.value.find(item => item.prop === key)
+        } else if (key === "streamMode") {
+          dt["取流模式"] = streamModes[v[key]]?.mode || "";
+        } else if (key === "streamType") {
+          dt["码流类型"] = streamTypes[v[key]] || "";
+        } else if (key === "vendor") {
+          dt["设备厂商"] = vendorImages[v[key]]?.name || "";
+        } else {
+          let mapKey = exportFileds.value.find(item => item.prop === key);
           if (mapKey) {
-            dt[mapKey.label] = v[key]
+            dt[mapKey.label] = v[key];
           }
         }
-      })
-      return dt
-    })
+      });
+      return dt;
+    });
     let worksheet = XLSX.utils.json_to_sheet(expordData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
@@ -692,7 +689,9 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       let has =
         maps.streamTypes.includes(streamType) &&
         maps.streamModes.includes(streamMode) &&
-        maps.vendors.includes(vendor) && item['视频流ID'] && item['取流地址'];
+        maps.vendors.includes(vendor) &&
+        item["视频流ID"] &&
+        item["取流地址"];
       if (!has) {
         index = i;
         break;
@@ -741,7 +740,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         FormRef.validate(async valid => {
           if (valid) {
             // 表单规则校验通过
-            debugger;
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
               await addStreamInfo(curData);

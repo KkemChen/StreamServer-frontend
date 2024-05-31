@@ -1,8 +1,6 @@
 import { createPinia, defineStore } from "pinia";
-import { useSysinfo } from "@/api/sysinfo";
 import { useSSH } from "@/api/ssh";
 
-const { fetchRemoteAllInfo } = useSysinfo();
 const { sshConnect, disconnectSsh } = useSSH();
 const REMOTE_CONFIG = "_Remote-config";
 const IS_ACTIVED = "_Is-acived";
@@ -19,17 +17,7 @@ export const useGlobalStore = defineStore({
         user: "root",
         password: ""
       },
-      systemInfo: {
-        cpuInfo: {},
-        cpuDetail: [],
-        memoryInfo: {},
-        loadInfo: {},
-        networksInfo: [],
-        processInfo: [],
-        diskInfo: "",
-        diskDetail: [],
-        gpuDetail: []
-      },
+      systemInfo: {},
       appPath: {
         ivauto_ivs_server: "/opt/ivauto_ivs_server/ivauto_ivs_server",
         ivauto_quality_detection:
@@ -95,31 +83,7 @@ export const useGlobalStore = defineStore({
       let remoteConfigCache = this.getRemoteConfigCache();
       return remoteConfigCache[id];
     },
-    async getSystemInfo() {
-      if (this.isConnected) {
-        const requestUrl = `${this.remoteConfig.host}:${this.remoteConfig.port}`;
-        const res = await fetchRemoteAllInfo(requestUrl);
-        this.systemInfo.cpuInfo = res.cpu_info;
-        this.systemInfo.cpuDetail = res.cpu_detail;
-        this.systemInfo.memoryInfo = res.mem_info;
-        this.systemInfo.loadInfo = res.load_info;
-        this.systemInfo.networksInfo = res.net_info;
-        this.systemInfo.processInfo = res.process_info;
-        this.systemInfo.diskInfo = res.disk_info;
-        this.systemInfo.diskDetail = res.disk_detail;
-        this.systemInfo.gpuDetail = res.gpu_detail;
-      }
-      const res = await fetchRemoteAllInfo("test");
-      this.systemInfo.cpuInfo = res.cpu_info;
-      this.systemInfo.cpuDetail = res.cpu_detail;
-      this.systemInfo.memoryInfo = res.mem_info;
-      this.systemInfo.loadInfo = res.load_info;
-      this.systemInfo.networksInfo = res.net_info;
-      this.systemInfo.processInfo = res.process_info;
-      this.systemInfo.diskInfo = res.disk_info;
-      this.systemInfo.diskDetail = res.disk_detail;
-      this.systemInfo.gpuDetail = res.gpu_detail;
-    },
+    async getSystemInfo() {},
     async getRemoteConnection(remoteConfigObj) {
       const res = await sshConnect(
         remoteConfigObj.host,
@@ -146,14 +110,6 @@ export const useGlobalStore = defineStore({
     },
     setLocalRemoteConfig(value) {
       localStorage.setItem(REMOTE_CONFIG, JSON.stringify(value));
-    },
-    setSystemInfo(cpuInfo, memoryInfo, loadInfo, networksInfo) {
-      this.systemInfo = {
-        cpuInfo,
-        memoryInfo,
-        loadInfo,
-        networksInfo
-      };
     },
     setLocalAppPath(value) {
       localStorage.setItem("appPath", JSON.stringify(value));
