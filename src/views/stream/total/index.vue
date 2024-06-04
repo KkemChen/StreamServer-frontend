@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { ref, watch, nextTick } from "vue";
-import tree from "./tree.vue";
+// import tree from "./tree.vue";
 import { useUser } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
-import Upload from "@iconify-icons/ri/upload-line";
-import Role from "@iconify-icons/ri/admin-line";
-import Password from "@iconify-icons/ri/lock-password-line";
-import More from "@iconify-icons/ep/more-filled";
+// import Upload from "@iconify-icons/ri/upload-line";
+// import Role from "@iconify-icons/ri/admin-line";
+// import Password from "@iconify-icons/ri/lock-password-line";
+// import More from "@iconify-icons/ep/more-filled";
 import Delete from "@iconify-icons/ep/delete";
 import EditPen from "@iconify-icons/ep/edit-pen";
 import Refresh from "@iconify-icons/ep/refresh";
@@ -20,6 +20,7 @@ import * as Elicon from "@element-plus/icons-vue";
 // import flvjs from "flv.js";
 import mpegts from "mpegts.js";
 import DPlayer from "dplayer";
+import PureTable from "@pureadmin/table";
 
 defineOptions({
   name: "SystemUser"
@@ -37,25 +38,25 @@ const {
   loading,
   columns,
   dataList,
-  treeData,
-  treeLoading,
+  // treeData,
+  // treeLoading,
   selectedNum,
   pagination,
-  buttonClass,
+  // buttonClass,
   deviceDetection,
   fetchAll,
   onSearch,
   resetForm,
   onbatchDel,
   openDialog,
-  onTreeSelect,
-  handleUpdate,
+  // onTreeSelect,
+  // handleUpdate,
   handleDelete,
   downloadTemplate,
   selectFile,
-  handleUpload,
-  handleReset,
-  handleRole,
+  // handleUpload,
+  // handleReset,
+  // handleRole,
   handleSizeChange,
   onSelectionCancel,
   handleCurrentChange,
@@ -83,7 +84,7 @@ watch(playDialogVisible, newVal => {
           url: videoUrl.value,
           type: "customFlv",
           customType: {
-            customFlv: function (video, player) {
+            customFlv: function (video) {
               flvPlayer = mpegts.createPlayer({
                 type: "flv",
                 url: video.src,
@@ -207,7 +208,7 @@ const play = (id: String) => {
           <el-button
             :icon="Elicon.Download"
             type="primary"
-            @click="exportFiledsDialog=true"
+            @click="exportFiledsDialog = true"
           >
             批量导出
           </el-button>
@@ -249,17 +250,17 @@ const play = (id: String) => {
             :adaptiveConfig="{ offsetBottom: 108 }"
             :columns="dynamicColumns"
             :data="dataList"
-            border
             :header-cell-style="{
               background: 'var(--el-fill-color-light)',
               color: 'var(--el-text-color-primary)'
             }"
             :loading="loading"
             :pagination="pagination"
-            :paginationSmall="size === 'small' ? true : false"
+            :paginationSmall="size === 'small'"
             :size="size"
             adaptive
             align-whole="center"
+            border
             row-key="id"
             table-layout="auto"
             @selection-change="handleSelectionChange"
@@ -290,6 +291,7 @@ const play = (id: String) => {
               <el-popconfirm
                 :title="`是否确认删除用户编号为${row.id}的这条数据`"
                 :width="200"
+                class="thisismystyle"
                 @confirm="handleDelete(row)"
               >
                 <template #reference>
@@ -379,6 +381,7 @@ const play = (id: String) => {
         <el-descriptions :column="1" border class="h-systemInfo">
           <el-descriptions-item
             v-for="item in detailInfo"
+            :key="item.value"
             class-name="system-content"
           >
             <template #label label-align="center">
@@ -406,32 +409,41 @@ const play = (id: String) => {
       v-model="exportFiledsDialog"
       :show-close="true"
     >
-    <template #header>
-      <div class="dialogTitle">请选择需要导出的字段</div>
-    </template>
-    <div class="selectBody">
-      <el-checkbox-group v-model="checkedFileds">
-        <el-checkbox v-for="item in exportFileds"  :key="item.prop" :label="item.label" :value="item.prop" />
-      </el-checkbox-group>
-      <el-button size="large" type="primary" @click="downloadData()">开始导出</el-button>
-    </div>
+      <template #header>
+        <div class="dialogTitle">请选择需要导出的字段</div>
+      </template>
+      <div class="selectBody">
+        <el-checkbox-group v-model="checkedFileds">
+          <el-checkbox
+            v-for="item in exportFileds"
+            :key="item.prop"
+            :label="item.label"
+            :value="item.prop"
+          />
+        </el-checkbox-group>
+        <el-button size="large" type="primary" @click="downloadData()"
+          >开始导出
+        </el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.dialogTitle{
+.dialogTitle {
   padding: 15px;
   font-size: 15px;
   color: #1f2329;
   box-sizing: border-box;
 }
-.selectBody{
+
+.selectBody {
   width: 100%;
   text-align: center;
   box-sizing: border-box;
   padding: 15px;
 }
+
 :deep(.el-dropdown-menu__item i) {
   margin: 0;
 }

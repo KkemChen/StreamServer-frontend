@@ -4,8 +4,22 @@ import { isPhone, isEmail } from "@pureadmin/utils";
 
 /** 自定义表单规则校验 */
 export const formRules = reactive(<FormRules>{
-  id: [{ required: true, message: "ID为必填项", trigger: "blur" }],
-  url: [{ required: true, message: "ID为必填项", trigger: "blur" }],
+  id: [
+    {
+      required: true,
+      trigger: "blur",
+      validator: (rule, value, callback) => {
+        let msg;
+        if (!value) {
+          msg = new Error("ID为必填项");
+        } else if (!/^[a-zA-Z0-9]+$/.test(value)) {
+          msg = new Error("ID只能是大小写字母数字的组合");
+        }
+        callback(msg);
+      }
+    }
+  ],
+  url: [{ required: true, message: "url为必填项", trigger: "blur" }],
   nickname: [{ required: true, message: "用户昵称为必填项", trigger: "blur" }],
   username: [{ required: true, message: "用户名称为必填项", trigger: "blur" }],
   password: [{ required: true, message: "用户密码为必填项", trigger: "blur" }],

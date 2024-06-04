@@ -47,8 +47,7 @@ export default defineComponent({
   setup(props, { emit, slots, attrs }) {
     const size = ref("default");
     const loading = ref(false);
-    const checkAll = ref(true);
-    const isIndeterminate = ref(false);
+
     const isExpandAll = ref(props.isExpandAll);
     let filterColumns = cloneDeep(props?.columns).filter(column => {
       return isBoolean(column?.hide)
@@ -58,6 +57,14 @@ export default defineComponent({
     let checkColumnList = getKeyList(cloneDeep(props?.columns), "label");
     const checkedColumns = ref(getKeyList(cloneDeep(filterColumns), "label"));
     const dynamicColumns = ref(cloneDeep(props?.columns));
+
+    const checkAll = ref(
+      checkedColumns.value.length === dynamicColumns.value.length
+    );
+    const isIndeterminate = ref(
+      checkedColumns.value.length > 0 &&
+        checkedColumns.value.length !== dynamicColumns.value.length
+    );
 
     const getDropdownItemStyle = computed(() => {
       return s => {
@@ -116,9 +123,15 @@ export default defineComponent({
     function handleCheckAllChange(val: boolean) {
       checkedColumns.value = val ? checkColumnList : [];
       isIndeterminate.value = false;
-      dynamicColumns.value.map(column =>
-        val ? (column.hide = false) : (column.hide = true)
-      );
+      let showarr = [];
+
+      dynamicColumns.value.forEach(column => {
+        column.hide = !val;
+        if (!column.hide) {
+          showarr.push(column.label);
+        }
+      });
+      localStorage.setItem("streamHideCol", JSON.stringify(showarr));
     }
 
     function handleCheckedColumnsChange(value: string[]) {

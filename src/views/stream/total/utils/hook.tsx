@@ -1,12 +1,12 @@
 import "./reset.css";
-import dayjs from "dayjs";
+// import dayjs from "dayjs";
 import * as XLSX from "xlsx";
 
 import { onBeforeUnmount } from "vue";
 import roleForm from "../form/role.vue";
 import editForm from "../form/index.vue";
 import { zxcvbn } from "@zxcvbn-ts/core";
-import { handleTree } from "@/utils/tree";
+// import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
 import croppingUpload from "../upload.vue";
 import userAvatar from "@/assets/user.jpg";
@@ -21,7 +21,7 @@ import univiewImage from "@/assets/vendor/uniview.png";
 import tdyImage from "@/assets/vendor/tiandy.png";
 import otherImage from "@/assets/vendor/other.png";
 import Tag from "primevue/tag";
-import UserIcon from "@iconify-icons/ri/user-3-line";
+// import UserIcon from "@iconify-icons/ri/user-3-line";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
 const vendorImages = {
@@ -63,7 +63,7 @@ const detailInfo = reactive({
 import {
   getKeyList,
   isAllEmpty,
-  hideTextAtIndex,
+  // hideTextAtIndex,
   deviceDetection
 } from "@pureadmin/utils";
 import {
@@ -80,8 +80,8 @@ import {
   ElForm,
   ElInput,
   ElFormItem,
-  ElProgress,
-  ElMessageBox
+  ElProgress
+  // ElMessageBox
 } from "element-plus";
 import {
   type Ref,
@@ -93,7 +93,8 @@ import {
   reactive,
   onMounted
 } from "vue";
-import { retrieveColumnLayout } from "echarts/types/src/layout/barGrid.js";
+
+// import { retrieveColumnLayout } from "echarts/types/src/layout/barGrid.js";
 
 export function useUser(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
@@ -156,7 +157,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "ID",
       prop: "id",
-      width: 130
+      width: 130,
+      showOverflowTooltip: true
     },
     {
       label: "IP地址",
@@ -168,19 +170,9 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       resizable: true,
       label: "Url",
       prop: "url",
-      minWidth: 150,
-      cellRenderer: ({ row }) => (
-        <div
-          style={{
-            maxWidth: "150px", // 设置最大宽度
-            whiteSpace: "nowrap", // 文本不换行
-            overflow: "hidden", // 溢出部分隐藏
-            textOverflow: "ellipsis" // 超出部分显示省略号
-          }}
-        >
-          {row && row.url ? row.url : ""}
-        </div>
-      )
+      width: 150,
+      showOverflowTooltip: true,
+      cellRenderer: ({ row }) => (row && row.url ? row.url : "")
     },
     {
       label: "设备厂商", //1.海康 2.大华 3.宇视 4.天地伟业
@@ -315,14 +307,12 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   );
   checkedFileds.value.push("rtsp");
 
-  if (hideCol.length > 0) {
-    columns = columns.map(v => {
-      return {
-        ...v,
-        hide: !hideCol.includes(v.label)
-      };
-    });
-  }
+  columns = columns.map(v => {
+    return {
+      ...v,
+      hide: !hideCol.includes(v.label)
+    };
+  });
   const buttonClass = computed(() => {
     return [
       "!h-[20px]",
@@ -501,7 +491,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     if (!treeList || !treeList.length) return;
     const newTreeList = [];
     for (let i = 0; i < treeList.length; i++) {
-      treeList[i].disabled = treeList[i].status === 0 ? true : false;
+      treeList[i].disabled = treeList[i].status === 0;
       formatHigherDeptOptions(treeList[i].children);
       newTreeList.push(treeList[i]);
     }
@@ -509,13 +499,20 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   }
 
   function downloadTemplate() {
-    // let worksheet = XLSX.utils.aoa_to_sheet([
-    //   ['视频流名称', 'ip地址', '码流类型', '设备厂商', '取流模式', '取流地址']
-    // ]);
-    // const workbook = XLSX.utils.book_new();
-    // XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    // XLSX.writeFile(workbook, "流媒体导入模板.xlsx");
-    window.open("/流媒体导入模板.xlsx", "_blank");
+    let worksheet = XLSX.utils.aoa_to_sheet([
+      [
+        "视频流ID",
+        "视频流名称",
+        "ip地址",
+        "码流类型",
+        "设备厂商",
+        "取流模式",
+        "取流地址"
+      ]
+    ]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, "流媒体导入模板.xlsx");
   }
 
   const fileType = [".xlsx", ".xls"];
@@ -555,27 +552,42 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
 
   function formatData(list: Array<Object>) {
     return list.map(v => {
+      //表格内容
       let vendor = v["设备厂商"];
       let streamMode = v["取流模式"];
       let streamType = v["码流类型"];
-      // 根据值来找key
+      // 根据值来找key,对象不可以遍历
+      let isFind = false;
       for (let key in streamModes) {
         if (streamMode === streamModes[key].mode) {
           streamMode = ~~key;
+          isFind = true;
           break;
         }
       }
+      if (!isFind) {
+        streamMode = 0;
+      }
+      isFind = false;
       for (let key in streamTypes) {
         if (streamType === streamTypes[key]) {
           streamType = ~~key;
+          isFind = true;
           break;
         }
+      }
+      if (!isFind) {
+        streamType = 0;
       }
       for (let key in vendorImages) {
         if (vendor === vendorImages[key].name) {
           vendor = ~~key;
+          isFind = true;
           break;
         }
+      }
+      if (!isFind) {
+        vendor = 0;
       }
       return {
         // "title": "修改",
@@ -612,7 +624,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         } else if (key === "http_flv") {
           dt[key] = `http://${ip}:8096/live/${v.id}.live.flv`;
         } else if (key === "http_fmp4") {
-          dt[key] = `http://${ip}:8096/live/${v.id}.lvie.mp4`;
+          dt[key] = `http://${ip}:8096/live/${v.id}.live.mp4`;
         } else if (key === "hls") {
           dt[key] = `http://${ip}:8096/live/${v.id}/hls.m3u8`;
         } else if (key === "streamMode") {
@@ -658,8 +670,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       reader.onload = (e: any) => {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: "array" });
-
-        // 假设我们只读取第一个工作表
+        // 只读取第一个工作表
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
@@ -690,7 +701,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         maps.streamTypes.includes(streamType) &&
         maps.streamModes.includes(streamMode) &&
         maps.vendors.includes(vendor) &&
-        item["视频流ID"] &&
+        /^[a-zA-Z0-9]+$/.test(item["视频流ID"]) &&
         item["取流地址"];
       if (!has) {
         index = i;
@@ -906,7 +917,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     detailInfo["rtsp"].value = `rtsp://${ip}:554/live/${row.id}`;
     detailInfo["rtmp"].value = `rtmp://${ip}:2935/live/${row.id}`;
     detailInfo["http_flv"].value = `http://${ip}:8096/live/${row.id}.live.flv`;
-    detailInfo["http_fmp4"].value = `http://${ip}:8096/live/${row.id}.lvie.mp4`;
+    detailInfo["http_fmp4"].value = `http://${ip}:8096/live/${row.id}.live.mp4`;
     detailInfo["hls"].value = `http://${ip}:8096/live/${row.id}/hls.m3u8`;
 
     detailInfo["createTime"].value = row.createTime ? row.createTime : "";
