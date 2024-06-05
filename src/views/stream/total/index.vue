@@ -76,6 +76,7 @@ watch(playDialogVisible, newVal => {
   if (newVal) {
     nextTick().then(() => {
       // 对话框显示，初始化DPlayer
+
       dp = new DPlayer({
         container: document.getElementById("dplayer"),
         autoplay: true,
@@ -95,6 +96,14 @@ watch(playDialogVisible, newVal => {
             }
           }
         }
+      });
+      let doms = [
+        ...document.querySelectorAll(
+          "#dplayer .dplayer-play-icon,#dplayer .dplayer-bar-wrap,#dplayer .dplayer-setting"
+        )
+      ];
+      doms.forEach(v => {
+        v.style.display = "none";
       });
     });
   } else {

@@ -147,7 +147,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "序号",
       type: "index",
-      minWidth: 120
+      width: 80
     },
     {
       label: "名称",
@@ -157,20 +157,20 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "ID",
       prop: "id",
-      width: 130,
+      width: 200,
       showOverflowTooltip: true
     },
     {
       label: "IP地址",
       prop: "ip",
-      minWidth: 80
+      width: 100
     },
     {
       hide: true,
       resizable: true,
       label: "Url",
       prop: "url",
-      width: 150,
+      width: 200,
       showOverflowTooltip: true,
       cellRenderer: ({ row }) => (row && row.url ? row.url : "")
     },
@@ -208,7 +208,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "取流模式",
       prop: "streamMode",
-      minWidth: 80,
+      width: 200,
       cellRenderer: ({ row, props }) => {
         let tagType =
           streamModes[row.streamMode]?.tagType || streamModes[0].tagType;
@@ -266,13 +266,13 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       hide: true,
       label: "创建时间",
       prop: "createTime",
-      minWidth: 130
+      width: 160
     },
     {
       hide: true,
       label: "更新时间",
       prop: "updateTime",
-      minWidth: 130
+      width: 160
     },
     {
       label: "操作",
@@ -499,20 +499,21 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   }
 
   function downloadTemplate() {
-    let worksheet = XLSX.utils.aoa_to_sheet([
-      [
-        "视频流ID",
-        "视频流名称",
-        "ip地址",
-        "码流类型",
-        "设备厂商",
-        "取流模式",
-        "取流地址"
-      ]
-    ]);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "流媒体导入模板.xlsx");
+    // let worksheet = XLSX.utils.aoa_to_sheet([
+    //   [
+    //     "视频流ID",
+    //     "视频流名称",
+    //     "ip地址",
+    //     "码流类型",
+    //     "设备厂商",
+    //     "取流模式",
+    //     "取流地址"
+    //   ]
+    // ]);
+    // const workbook = XLSX.utils.book_new();
+    // XLSX.utils.book_append_sheet(workbook, worksheet, "流媒体导入模板");
+    // XLSX.writeFile(workbook, "流媒体导入模板.xlsx");
+    window.open("/web/流媒体导入模板.xlsx", "_blank");
   }
 
   const fileType = [".xlsx", ".xls"];
@@ -596,7 +597,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         streamMode: streamMode,
         vendor: vendor,
         streamType: streamType,
-        ip: v["ip地址"],
+        ip: `${v["ip地址"] || ""}`,
         url: v["取流地址"],
         status: {
           live: false,

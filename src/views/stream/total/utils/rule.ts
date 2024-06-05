@@ -13,7 +13,7 @@ export const formRules = reactive(<FormRules>{
         if (!value) {
           msg = new Error("ID为必填项");
         } else if (!/^[a-zA-Z0-9]+$/.test(value)) {
-          msg = new Error("ID只能是大小写字母数字的组合");
+          msg = new Error("ID允许输入的字符类型为：大小写字母、整数");
         }
         callback(msg);
       }
