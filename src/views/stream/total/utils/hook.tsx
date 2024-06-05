@@ -513,7 +513,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     // const workbook = XLSX.utils.book_new();
     // XLSX.utils.book_append_sheet(workbook, worksheet, "流媒体导入模板");
     // XLSX.writeFile(workbook, "流媒体导入模板.xlsx");
-    window.open("/web/流媒体导入模板.xlsx", "_blank");
+    window.open("/web/exportTemplate.xlsx", "_blank");
   }
 
   const fileType = [".xlsx", ".xls"];
