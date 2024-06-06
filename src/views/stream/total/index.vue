@@ -73,6 +73,16 @@ const videoUrl = ref("");
 let dp = null;
 let flvPlayer = null;
 
+const setLiveDotColor = color => {
+  if (color == "#b7daff") {
+    
+  }
+  const liveDot = document.querySelector(".dplayer-live-dot");
+  if (liveDot) {
+    liveDot.style.background = color;
+  }
+};
+
 function initPlayer(hasAudio) {
   flvPlayer = mpegts.createPlayer({
     type: "flv",
@@ -82,6 +92,8 @@ function initPlayer(hasAudio) {
 
   dp = new DPlayer({
     container: document.getElementById("dplayer"),
+    live: true,
+    screenshot: true,
     video: {
       url: videoUrl.value,
       type: "customFlv",
@@ -93,14 +105,36 @@ function initPlayer(hasAudio) {
       }
     }
   });
-  let doms = [
-    ...document.querySelectorAll(
-      "#dplayer .dplayer-play-icon,#dplayer .dplayer-bar-wrap,#dplayer .dplayer-setting"
-    )
-  ];
-  doms.forEach(v => {
-    v.style.display = "none";
+
+  setLiveDotColor("#ff0000");
+
+  dp.on("pause", () => setLiveDotColor("#b7daff"));
+
+  dp.on("loadeddata", function () {
+    // 获取 .dplayer-live-dot 元素
+    const live = document.querySelector(".dplayer-live-badge");
+    // 检查元素是否存在
+    if (live) {
+      // 添加点击事件监听器
+      live.style.cursor = "pointer"; // 添加鼠标指针样式
+      live.addEventListener("click", function () {
+        // 停止当前流并重新加载视频
+        dp.pause();
+        flvPlayer.unload();
+        flvPlayer.load();
+        flvPlayer.play();
+        setLiveDotColor("#ff0000");
+      });
+    }
   });
+  // let doms = [
+  //   ...document.querySelectorAll(
+  //     "#dplayer .dplayer-play-icon,#dplayer .dplayer-bar-wrap,#dplayer .dplayer-setting"
+  //   )
+  // ];
+  // doms.forEach(v => {
+  //   v.style.display = "none";
+  // });
   dp.play();
 }
 
