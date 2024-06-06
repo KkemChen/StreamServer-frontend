@@ -72,39 +72,57 @@ const playDialogVisible = ref(false);
 const videoUrl = ref("");
 let dp = null;
 let flvPlayer = null;
+
+function initPlayer(hasAudio) {
+  flvPlayer = mpegts.createPlayer({
+    type: "flv",
+    url: videoUrl.value,
+    hasAudio: hasAudio
+  });
+
+  dp = new DPlayer({
+    container: document.getElementById("dplayer"),
+    video: {
+      url: videoUrl.value,
+      type: "customFlv",
+      customType: {
+        customFlv: (video, player) => {
+          flvPlayer.attachMediaElement(video);
+          flvPlayer.load();
+        }
+      }
+    }
+  });
+  let doms = [
+    ...document.querySelectorAll(
+      "#dplayer .dplayer-play-icon,#dplayer .dplayer-bar-wrap,#dplayer .dplayer-setting"
+    )
+  ];
+  doms.forEach(v => {
+    v.style.display = "none";
+  });
+  dp.play();
+}
+
+function checkAudioFormat() {
+  flvPlayer.on(mpegts.Events.METADATA_ARRIVED, function (event) {
+    const audioCodecid = event.audiocodecid;
+    // console.log("Audio codec:", audioCodecid);
+    // 10: AAC; 7: MP3 G711;
+    if (!audioCodecid || audioCodecid != 10) {
+      flvPlayer.destroy();
+      dp.destroy();
+      initPlayer(false);
+    }
+  });
+}
+
 watch(playDialogVisible, newVal => {
   if (newVal) {
     nextTick().then(() => {
       // 对话框显示，初始化DPlayer
-
-      dp = new DPlayer({
-        container: document.getElementById("dplayer"),
-        autoplay: true,
-        preload: "auto",
-        video: {
-          url: videoUrl.value,
-          type: "customFlv",
-          customType: {
-            customFlv: function (video) {
-              flvPlayer = mpegts.createPlayer({
-                type: "flv",
-                url: video.src,
-                isLive: true
-              });
-              flvPlayer.attachMediaElement(video);
-              flvPlayer.load();
-            }
-          }
-        }
-      });
-      let doms = [
-        ...document.querySelectorAll(
-          "#dplayer .dplayer-play-icon,#dplayer .dplayer-bar-wrap,#dplayer .dplayer-setting"
-        )
-      ];
-      doms.forEach(v => {
-        v.style.display = "none";
-      });
+      initPlayer(true);
+      checkAudioFormat();
     });
   } else {
     // 对话框隐藏，销毁DPlayer实例
