@@ -703,7 +703,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         // maps.streamTypes.includes(streamType) &&
         // maps.streamModes.includes(streamMode) &&
         // maps.vendors.includes(vendor) &&
-        /^[a-zA-Z0-9]{1,n}$/.test(item["视频流ID"]) &&
+        /^[a-zA-Z0-9]+$/.test(`${item["视频流ID"]||''}`) &&
         item["取流地址"];
       if (!has) {
         index = i + 1;
