@@ -106,7 +106,7 @@ function initPlayer(hasAudio) {
     }
   });
 
-  setLiveDotColor("#ff0000");
+  
 
   dp.on("pause", () => setLiveDotColor("#b7daff"));
 
@@ -119,22 +119,18 @@ function initPlayer(hasAudio) {
       live.style.cursor = "pointer"; // 添加鼠标指针样式
       live.addEventListener("click", function () {
         // 停止当前流并重新加载视频
-        dp.pause();
+        // dp.pause();
         flvPlayer.unload();
         flvPlayer.load();
         flvPlayer.play();
-        setLiveDotColor("#ff0000");
+        setTimeout(() => {
+          setLiveDotColor("#ff0000");
+        },0)
+        
       });
     }
   });
-  // let doms = [
-  //   ...document.querySelectorAll(
-  //     "#dplayer .dplayer-play-icon,#dplayer .dplayer-bar-wrap,#dplayer .dplayer-setting"
-  //   )
-  // ];
-  // doms.forEach(v => {
-  //   v.style.display = "none";
-  // });
+  setLiveDotColor("#ff0000");
   dp.play();
 }
 
