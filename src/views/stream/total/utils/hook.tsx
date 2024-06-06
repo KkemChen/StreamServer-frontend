@@ -142,11 +142,16 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       label: "勾选列", // 如果需要表格多选，此处label必须设置
       type: "selection",
       fixed: "left",
+      noExport: true,
       reserveSelection: true // 数据刷新后保留选项
     },
     {
       label: "序号",
       type: "index",
+      noExport: true,
+      index(id) {
+        return (pagination.currentPage - 1) * pagination.pageSize + id + 1
+      },
       width: 80
     },
     {
@@ -239,6 +244,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     },
     {
       label: "状态",
+      noExport: true,
       prop: "status",
       minWidth: 80,
       cellRenderer: ({ row, props }) => {
@@ -277,13 +283,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       label: "操作",
       fixed: "right",
       width: 300,
+      noExport: true,
       slot: "operation"
     }
   ];
   if (hideCol.length === 0) {
     hideCol = columns.filter(v => !v.hide).map(v => v.label)
   }
-  const exportFileds: any = ref(columns.slice(2, -1));
+  const exportFileds: any = ref(columns.filter(v => !v.noExport));
   const checkedFileds: any = ref(exportFileds.value.map(v => v.prop));
   exportFileds.value.push(
     {
