@@ -166,7 +166,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       width: 100
     },
     {
-      hide: true,
       resizable: true,
       label: "Url",
       prop: "url",
@@ -208,6 +207,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "取流模式",
       prop: "streamMode",
+      hide: true,
       width: 200,
       cellRenderer: ({ row, props }) => {
         let tagType =
@@ -229,7 +229,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       }
     },
     {
-      hide: true,
       label: "码流类型",
       prop: "streamType",
       minWidth: 80,
@@ -281,6 +280,9 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       slot: "operation"
     }
   ];
+  if (hideCol.length === 0) {
+    hideCol = columns.filter(v => !v.hide).map(v => v.label)
+  }
   const exportFileds: any = ref(columns.slice(2, -1));
   const checkedFileds: any = ref(exportFileds.value.map(v => v.prop));
   exportFileds.value.push(
@@ -611,8 +613,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     // 返回当前选中的行
     let curSelected = tableRef.value.getTableRef().getSelectionRows();
     if (curSelected.length === 0) {
-      curSelected = dataList.value;
-      // tableRef.value.getTableRef().clearSelection();
+      curSelected = streamInfo.list;
     }
     const ip = `${import.meta.env.VITE_APP_BASE_IP ? import.meta.env.VITE_APP_BASE_IP : window.location.hostname}`;
     let expordData = curSelected.map(v => {
@@ -703,7 +704,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         // maps.streamTypes.includes(streamType) &&
         // maps.streamModes.includes(streamMode) &&
         // maps.vendors.includes(vendor) &&
-        /^[a-zA-Z0-9]{1,n}$/.test(item["视频流ID"]) &&
+        /^[a-zA-Z0-9]+$/.test(`${item["视频流ID"] || ''}`) &&
         item["取流地址"];
       if (!has) {
         index = i + 1;

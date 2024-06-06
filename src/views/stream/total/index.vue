@@ -562,4 +562,3 @@ const play = (id: String) => {
   // }
 }
 </style>
-./index.vue
