@@ -611,8 +611,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     // 返回当前选中的行
     let curSelected = tableRef.value.getTableRef().getSelectionRows();
     if (curSelected.length === 0) {
-      curSelected = dataList.value;
-      // tableRef.value.getTableRef().clearSelection();
+      curSelected = streamInfo.list;
     }
     const ip = `${import.meta.env.VITE_APP_BASE_IP ? import.meta.env.VITE_APP_BASE_IP : window.location.hostname}`;
     let expordData = curSelected.map(v => {
@@ -703,7 +702,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         // maps.streamTypes.includes(streamType) &&
         // maps.streamModes.includes(streamMode) &&
         // maps.vendors.includes(vendor) &&
-        /^[a-zA-Z0-9]+$/.test(`${item["视频流ID"]||''}`) &&
+        /^[a-zA-Z0-9]+$/.test(`${item["视频流ID"] || ''}`) &&
         item["取流地址"];
       if (!has) {
         index = i + 1;
