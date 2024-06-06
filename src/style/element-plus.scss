@@ -111,6 +111,7 @@
     0 9px 28px 8px #0000000d !important;
 
   & .el-message__content {
+    word-break: break-all;
     color: #000000d9 !important;
     pointer-events: all !important;
     background-image: initial !important;

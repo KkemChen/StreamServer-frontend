@@ -415,7 +415,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     const curSelected = tableRef.value.getTableRef().getSelectionRows();
     // 接下来根据实际业务，通过选中行的某项数据，比如下面的id，调用接口进行批量删除
     await batchDelStreamInfo(curSelected);
-    message(`已删除ID为 ${getKeyList(curSelected, "id")} 的数据`, {
+    message(`已删除ID为${getKeyList(curSelected, "id")}的数据`, {
       type: "success"
     });
     tableRef.value.getTableRef().clearSelection();
@@ -598,11 +598,11 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         vendor: vendor,
         streamType: streamType,
         ip: `${v["ip地址"] || ""}`,
-        url: `${v["取流地址"] || ''}`,
-        status: {
-          live: false,
-          playerCount: 0
-        }
+        url: `${v["取流地址"] || ''}`
+        // status: {
+        //   live: false,
+        //   playerCount: 0
+        // }
       };
     });
   }
@@ -703,7 +703,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         // maps.streamTypes.includes(streamType) &&
         // maps.streamModes.includes(streamMode) &&
         // maps.vendors.includes(vendor) &&
-        /^[a-zA-Z0-9]+$/.test(item["视频流ID"]) &&
+        /^[a-zA-Z0-9]{1,n}$/.test(item["视频流ID"]) &&
         item["取流地址"];
       if (!has) {
         index = i + 1;
