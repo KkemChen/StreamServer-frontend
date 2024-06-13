@@ -11,45 +11,54 @@ const props = defineProps({
     type: String,
     required: true
   },
+  types: {
+    type: Array,
+    default:()=>[]
+  },
   x: {
     type: Array,
     default:()=>[]
   },
-  min1: {
-    type: Array,
-    default:()=>[]
+  data: {
+    type: Object,
+    default: () => ({})
   },
-  min5: {
-    type: Array,
-    default:()=>[]
+  color: {
+    type: Object,
+    default: () => ({})
   },
-  min15: {
-    type: Array,
-    default:()=>[]
+  fontSize: {
+    type: Object,
+    default: () => ({})
   },
 });
-const types = reactive(['min1', 'min5', 'min15'])
 let chartDom;
 let rerenderStartTime = Date.now();
+let keyMap = {
+  rx: '下行流量',
+  tx:'上行流量'
+}
 const initChart = () => {
   chartDom.setOption({
-    title: {
-    show:false,
-    // text: 'Stacked Area Chart'
+  title: {
+    show:false
   },
   tooltip: {
     trigger: 'axis',
     axisPointer: {
       type: 'cross',
       label: {
-        backgroundColor: '#6a7985'
+        backgroundColor: '#444'
       }
     }
   },
   legend: {
-    data: types,
+    data: Object.keys(props.data.data),
     textStyle: {
       color:'#fff'
+    },
+    formatter: e => { 
+      return keyMap[e]
     }
   },
   grid: {
@@ -72,47 +81,32 @@ const initChart = () => {
   ],
   yAxis: [
     {
+      name: '（kb）',
+      nameLocation: 'end',
+      nameGap: 20,
+      nameTextStyle: {
+        color: '#fff',
+        padding:[0,20,0,0]
+      },
       type: 'value',
       axisLabel: {
         color:'#fff'
       }
     }
     ],
-  series: [
-    {
-      name: 'min1',
+    // 上行和下行的数据
+    series: Object.keys(props.data.data).map(v=>({
+      name: v,
       type: 'line',
       stack: 'Total',
-      areaStyle: {},
       emphasis: {
         focus: 'series'
       },
-      data: props.min1
-    },
-    {
-      name: 'min5',
-      type: 'line',
-      stack: 'Total',
-      areaStyle: {},
-      emphasis: {
-        focus: 'series'
-      },
-      data: props.min5
-    },
-    {
-      name: 'min15',
-      type: 'line',
-      stack: 'Total',
-      areaStyle: {},
-      emphasis: {
-        focus: 'series'
-      },
-      data: props.min15
-    }
-  ]
+      data: props.data.data[v]
+    }))
 });
 };
-let watchXId;
+let watchXId,watchDataId;
 const rerenderChart = () => {
   let time = Date.now();
   // 节流
@@ -132,21 +126,41 @@ onMounted(() => {
         xAxis: {
           data: n
         },
-        series: [
-          {
-            data: props.min1
-          },
-          {
-            data: props.min5
-          },
-          {
-            data: props.min15
-          }
-        ]
+        series:  Object.keys(props.data.data).map(v=>({
+      name: v,
+      type: 'line',
+      stack: 'Total',
+      emphasis: {
+        focus: 'series'
+      },
+      data: props.data.data[v]
+    }))
       })
     },
     {
       deep: true
+    }
+  );
+  watchDataId=watch(
+    () => props.data,
+    (n, o) => {
+      chartDom.setOption({
+        xAxis: {
+          data: props.x
+        },
+        series:  Object.keys(props.data.data).map(v=>({
+      name: v,
+      type: 'line',
+      stack: 'Total',
+      emphasis: {
+        focus: 'series'
+      },
+      data: n.data[v]
+    }))
+      })
+    },
+    {
+      deep:true
     }
   );
   initChart();
@@ -154,6 +168,7 @@ onMounted(() => {
 });
 onUnmounted(() => {
   watchXId();
+  watchDataId();
   window.removeEventListener("resize", rerenderChart);
 });
 </script>

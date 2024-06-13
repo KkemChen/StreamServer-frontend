@@ -17,7 +17,6 @@ export const useGlobalStore = defineStore({
         user: "root",
         password: ""
       },
-      systemInfo: {},
       appPath: {
         ivauto_ivs_server: "/opt/ivauto_ivs_server/ivauto_ivs_server",
         ivauto_quality_detection:
@@ -83,7 +82,6 @@ export const useGlobalStore = defineStore({
       let remoteConfigCache = this.getRemoteConfigCache();
       return remoteConfigCache[id];
     },
-    async getSystemInfo() {},
     async getRemoteConnection(remoteConfigObj) {
       const res = await sshConnect(
         remoteConfigObj.host,
