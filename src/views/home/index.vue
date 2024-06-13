@@ -1,8 +1,8 @@
 <template>
   <div class="home">
     <!-- 第一行 -->
-    <div class="fullWidth xflex">
-      <div class="contentBlock spacingRight color stretch spacingBottom">
+    <div class="fullWidth xgrid4 spacingBottom">
+      <div class="contentBlock color">
         <div class="blockTitle">系统信息</div>
         <div class="blockValue">
           主机名称：{{ data.host.hostname }}
@@ -20,40 +20,40 @@
           系统时间：{{ data.host.systime }}
         </div>
       </div>
-      <div class="contentBlock spacingRight color stretch spacingBottom">
+      <div class="contentBlock color stretch yflex">
         <div class="blockTitle">CPU占用率</div>
         <GaugeChart
           id="cpu"
           :color="color"
           :fontSize="fontSize"
           :data="cpuRate"
-          class="GaugeChart color"
+          class="GaugeChart stretch"
         />
       </div>
-      <div class="contentBlock spacingRight color stretch spacingBottom">
+      <div class="contentBlock color stretch yflex">
         <div class="blockTitle">内存占用率</div>
         <GaugeChart
           id="mem"
           :color="color"
           :fontSize="fontSize"
           :data="memRate"
-          class="GaugeChart color"
+          class="GaugeChart stretch"
         />
       </div>
-      <div class="contentBlock color stretch spacingBottom">
+      <div class="contentBlock color stretch yflex">
         <div class="blockTitle">虚拟内存</div>
         <GaugeChart
           id="swap"
           :color="color"
           :fontSize="fontSize"
           :data="swapRate"
-          class="GaugeChart color"
+          class="GaugeChart stretch"
         />
       </div>
     </div>
     <!-- 第二行 -->
-    <div class="fullWidth xflex">
-      <div class="contentBlock color yflex stretch spacingRight spacingBottom">
+    <div class="fullWidth xgrid3 spacingBottom">
+      <div class="contentBlock color yflex">
         <div class="blockTitle">负载情况</div>
         <LineChart
           id="load"
@@ -61,20 +61,20 @@
           :min1="loadMin1"
           :min5="loadMin5"
           :min15="loadMin15"
-          class="color stretch"
+          class="stretch"
         />
       </div>
-      <div class="contentBlock color yflex stretch spacingRight spacingBottom">
+      <div class="contentBlock color yflex">
         <div class="blockTitle">磁盘总空间</div>
         <PieChart
           id="disk"
           :color="color"
           :fontSize="fontSize"
           :data="data.disk"
-          class="color stretch"
+          class="stretch"
         />
       </div>
-      <div class="contentBlock color yflex stretch spacingBottom">
+      <div class="contentBlock color yflex">
         <div class="blockTitle">磁盘使用情况</div>
         <div class="tableHeader">
           <div class="colHeader" title="剩余容量">剩余容量</div>
@@ -84,7 +84,7 @@
           <div class="colHeader" title="使用率">使用率</div>
           <div class="colHeader" title="已使用">已使用</div>
         </div>
-        <div class="table spacingBottom">
+        <div class="table">
           <template v-for="item in data.disk" :key="item.mounted_on">
             <span class="tableData" :title="item.available">{{ item.available }}</span>
             <span class="tableData" :title="item.filesystem">{{ item.filesystem }}</span>
@@ -97,10 +97,10 @@
       </div>
     </div>
     <!-- 第三行 -->
-    <div class="fullWidth xflex stretch">
-      <div class="contentBlock color stretch yflex">
+    <div class="fullWidth">
+      <div class="contentBlock color yflex">
         <div class="blockTitle">网络流量统计</div>
-        <div id="blockTabs" class="stretch xflex color">
+        <div id="blockTabs" class="stretch xflex">
           <div class="tabs">
             <div :title="item.name+`[${item.ipv4.join()}]`" @click="curTab=item.name" :class="['tab',curTab===item.name&&'active']" v-for="item in netData" :key="item.name">{{ item.name }}&nbsp;{{ item.ipv4 }}</div>
           </div>
@@ -240,12 +240,16 @@ const loadDashboardData = async () => {
     let res = await dashboardData()
     if (res.code === 0) {
       // cpu占用率
-      
       cpuRate.value = Number.parseFloat((100-res.data.cpu.idle).toFixed(2))
       // 内存比率
       memRate.value = Number.parseFloat((res.data.mem.used / res.data.mem.total*100).toFixed(2)) 
       // 虚拟内存占用
-      swapRate.value = Number.parseFloat((res.data.swap.used / res.data.swap.total*100).toFixed(2))
+      if (res.data.swap.total === 0) {
+        swapRate.value = 0
+      }
+      else {
+        swapRate.value = Number.parseFloat((res.data.swap.used / res.data.swap.total*100).toFixed(2))
+      }
       //折线图和负载图共享x轴
       lineX.push(res.data.host.systime)
       loadMin1.push(res.data.load.min1)
@@ -296,10 +300,10 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 $backColor: #111;
 $frontColor: #fff;
-$spacing: 15px;
+$spacing: 10px;
 $radius:5px;
-$titleSize:35px;
-$bodySize:25px;
+$titleSize:25px;
+$bodySize:20px;
 $descSize:15px;
 // 16:9的比例
 $widthRate:16px;
@@ -322,6 +326,16 @@ $heightRate:9px;
   }
   .spacingBottom{
     margin-bottom: $spacing;
+  }
+  .xgrid3{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    grid-column-gap: $spacing;
+  }
+  .xgrid4{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    grid-column-gap: $spacing;
   }
   .xflex {
     display: flex;
@@ -376,13 +390,16 @@ $heightRate:9px;
     &>.blockValue{
       font-size: $bodySize;
       margin-top: $spacing;
+      overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
   }
   .spacingRight {
     margin-right:$spacing ;
   }
   .GaugeChart {
-    $rate:30;
+    $rate:20;
     min-width: $widthRate  *  $rate;
     min-height: $heightRate * $rate;
   }
