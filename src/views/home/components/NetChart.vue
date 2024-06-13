@@ -50,6 +50,10 @@ const initChart = () => {
       label: {
         backgroundColor: '#444'
       }
+    },
+    formatter(args) {
+      console.log(args);
+      return `${args[0].axisValueLabel}<br/>${args.map(v=>`${v.marker} ${keyMap[v.seriesName]}：${v.value}KB`).join('<br/>')}`
     }
   },
   legend: {
@@ -98,7 +102,6 @@ const initChart = () => {
     series: Object.keys(props.data.data).map(v=>({
       name: v,
       type: 'line',
-      stack: 'Total',
       emphasis: {
         focus: 'series'
       },
@@ -129,7 +132,6 @@ onMounted(() => {
         series:  Object.keys(props.data.data).map(v=>({
       name: v,
       type: 'line',
-      stack: 'Total',
       emphasis: {
         focus: 'series'
       },
@@ -151,7 +153,6 @@ onMounted(() => {
         series:  Object.keys(props.data.data).map(v=>({
       name: v,
       type: 'line',
-      stack: 'Total',
       emphasis: {
         focus: 'series'
       },

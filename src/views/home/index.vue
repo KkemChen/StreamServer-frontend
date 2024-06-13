@@ -4,19 +4,19 @@
     <div class="fullWidth xgrid4 spacingBottom">
       <div class="contentBlock color">
         <div class="blockTitle">系统信息</div>
-        <div class="blockValue">
+        <div class="blockValue" :title="data.host.hostname">
           主机名称：{{ data.host.hostname }}
         </div>
-        <div class="blockValue">
+        <div class="blockValue" :title="data.host.os_version">
           发行版本：{{ data.host.os_version }}
         </div>
-        <div class="blockValue">
+        <div class="blockValue" :title="data.host.os_release">
           内核版本：{{ data.host.os_release }}
         </div>
-        <div class="blockValue">
+        <div class="blockValue" :title="data.host.platform">
           系统类型：{{ data.host.platform }}
         </div>
-        <div class="blockValue">
+        <div class="blockValue" :title="data.host.systime">
           系统时间：{{ data.host.systime }}
         </div>
       </div>
@@ -84,15 +84,15 @@
           <div class="colHeader" title="使用率">使用率</div>
           <div class="colHeader" title="已使用">已使用</div>
         </div>
-        <div class="table">
-          <template v-for="item in data.disk" :key="item.mounted_on">
+        <div class="tables">
+          <div class="tr" v-for="item in data.disk" :key="item.mounted_on">
             <span class="tableData" :title="item.available">{{ item.available }}</span>
             <span class="tableData" :title="item.filesystem">{{ item.filesystem }}</span>
             <span class="tableData" :title="item.mounted_on">{{ item.mounted_on }}</span>
             <span class="tableData" :title="item.size">{{ item.size }}</span>
             <span class="tableData" :title="item.use_percent">{{ item.use_percent }}</span>
             <span class="tableData" :title="item.used">{{ item.used }}</span>
-          </template>
+          </div>
         </div>
       </div>
     </div>
@@ -141,8 +141,8 @@ const color = reactive({
   guage:['#00e280','#ffae3b','#dd001f']
 })
 const fontSize = reactive({
-  titleSize:35,
-  bodySize:25,
+  titleSize:25,
+  bodySize:20,
   descSize:15
 })
 
@@ -255,7 +255,7 @@ const loadDashboardData = async () => {
       loadMin1.push(res.data.load.min1)
       loadMin5.push(res.data.load.min5)
       loadMin15.push(res.data.load.min15)
-      // 负载图数据
+      // 网络流量统计
       res.data.net.forEach(v => {
         let name = v.interface_name
         let currentData = netData.find(v => v.name === name)
@@ -329,13 +329,13 @@ $heightRate:9px;
   }
   .xgrid3{
     display: grid;
-    grid-template-columns: repeat(3,1fr);
-    grid-column-gap: $spacing;
+    grid-template-columns: 0.5fr 0.5fr 1fr;
+    column-gap: $spacing;
   }
   .xgrid4{
     display: grid;
     grid-template-columns: repeat(4,1fr);
-    grid-column-gap: $spacing;
+    column-gap:$spacing ;
   }
   .xflex {
     display: flex;
@@ -349,33 +349,41 @@ $heightRate:9px;
   }
   .tableHeader{
     width: 100%;
+    flex-shrink: 0;
     display: grid;
+    column-gap:$spacing ;
+    row-gap: $spacing;
     grid-template-columns: repeat(6,1fr);
     .colHeader{
-      font-size: $bodySize;
+      font-weight: 600;
+      font-size: $descSize;
+      padding: $spacing;
     }
-    
   }
-  .table{
-    align-self: stretch;
+  .tables{
     width: 100%;
-    height: 240px;
-    flex-shrink: 0;
-    flex-grow: 1;
+    max-height: $heightRate * 30;
     overflow: auto;
-    display: grid;
-    grid-template-columns: repeat(6,1fr);
+    .tr{
+      margin-bottom: $spacing;
+      display: grid;
+      column-gap:$spacing ;
+      grid-template-columns: repeat(6,1fr);
+    }
     &::-webkit-scrollbar{
       display: none;
     }
     .tableData{
+      background-color: rgba($frontColor,0.05);
+      padding: $spacing;
+      box-sizing: border-box;
       font-size: $descSize;
     }
   }
   .colHeader,.tableData{
     overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   .stretch{
     align-self: stretch;
@@ -404,12 +412,12 @@ $heightRate:9px;
     min-height: $heightRate * $rate;
   }
   #load{
-    $rate:40;
+    $rate:30;
     min-width: $widthRate  *  $rate;
     min-height: $heightRate * $rate;
   }
   #disk{
-    $rate:40;
+    $rate:30;
     min-width: $widthRate  *  $rate;
     min-height: $heightRate * $rate;
   }
@@ -440,15 +448,15 @@ $heightRate:9px;
         color: $frontColor;
         font-size: $bodySize;
         margin-bottom: $spacing;
-        background-color: rgba($frontColor,0.15);
+        background-color: rgba($frontColor,0.05);
         padding: $spacing;
         border-radius: $radius;
         &:hover{
-          background-color: rgba($frontColor,0.10);
+          background-color: rgba($frontColor,0.3);
         }
       }
       .active{
-        background-color: rgba($frontColor,0.10);
+        background-color: rgba($frontColor,0.3);
       }
     }
   }

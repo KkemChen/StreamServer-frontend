@@ -82,7 +82,6 @@ const initChart = () => {
     {
       name: 'min1',
       type: 'line',
-      stack: 'Total',
       areaStyle: {},
       emphasis: {
         focus: 'series'
@@ -92,7 +91,6 @@ const initChart = () => {
     {
       name: 'min5',
       type: 'line',
-      stack: 'Total',
       areaStyle: {},
       emphasis: {
         focus: 'series'
@@ -102,7 +100,6 @@ const initChart = () => {
     {
       name: 'min15',
       type: 'line',
-      stack: 'Total',
       areaStyle: {},
       emphasis: {
         focus: 'series'

@@ -6,7 +6,7 @@
 //需要考虑loading怎么做
 import * as echarts from "echarts";
 import { watch } from "vue";
-import {  onMounted,  onUnmounted, defineProps } from "vue";
+import {  onMounted,  onUnmounted, defineProps,computed } from "vue";
 
 const props = defineProps({
   id: {
@@ -26,49 +26,60 @@ const props = defineProps({
     default: () => []
   }
 });
+const seriesData = computed(() => {
+  let use = 0;
+  props.data.forEach(v => { 
+    use+=parseFloat(v.use_percent)
+  })
+  let total = props.data.length * 100
+  return [
+    {
+          name: '已使用',
+          value:use
+        },
+        {
+          name: '未使用',
+        value:total-use
+        }
+  ]
+})
 let chartDom;
 let rerenderStartTime = Date.now();
 const initChart = () => {
   chartDom.setOption({
-  tooltip: {
+    tooltip: {
       trigger: 'item',
-      formatter: tooltip => {
-        let obj = props.data.find(v => v.mounted_on === tooltip.data.name)
-        return `${tooltip.marker}   ${tooltip.data.name}   ${obj?.used||''}`
+      formatter(args) {
+        return `${args.marker}${args.name}:${args.percent}%`
       }
-  },
-  legend: {
-    orient: 'vertical',
-    right: '0',
+    },
+    legend: {
+      show: true,
+      orient: 'vertical',
+    right: '5%',
     top: 'center',
     padding: 0,
-    formatter: name => {
-      let obj = props.data.find(v => v.mounted_on === name)
-      return `${name}（${obj?.used ||''}）`
-    },
     textStyle: {
       color:props.color.front
     }
-  },
-  series: [
-    {
-      name: '磁盘总空间',
-      type: 'pie',
-      radius: '95%',
-      center: ['30%', '50%'],
-      labelLine: {
-        show:false
-      },
-      label: {
-        show:false
-      },
-      data: props.data.map(v => ({
-          value: Number.parseFloat(v.use_percent),
-          name:v.mounted_on
-        }))
+    },
+    series: [
+      {
+        type: 'pie',
+        radius: '90%',
+        center: ['50%', '50%'],
+        labelLine: {
+          show:false
+        },
+        label: {
+          show: true,
+          position: 'inside',
+          formatter:'{d}%'
+        },
+        data: seriesData.value
+      }]
     }
-  ]
-});
+  );
 };
 let watchDataId;
 const rerenderChart = () => {
@@ -89,10 +100,7 @@ onMounted(() => {
       chartDom.setOption({
         series: [
           {
-            data:props.data.map(v => ({
-          value: Number.parseFloat(v.use_percent),
-          name:v.mounted_on
-        }))
+            data:seriesData.value
           }
         ]
       });
