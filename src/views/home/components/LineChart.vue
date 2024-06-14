@@ -123,6 +123,7 @@ onMounted(() => {
           return {
             name: v,
             type: "line",
+            showSymbol:false,
             data: props.data[v]
           };
         })

@@ -111,6 +111,7 @@ const initChart = () => {
       emphasis: {
         focus: "series"
       },
+      showSymbol:false,
       areaStyle: {},
       data: props.data.data[v]
     }))
