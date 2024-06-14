@@ -48,7 +48,8 @@ const initChart = () => {
       padding: 0,
       textStyle: {
         color: props.color.front
-      }
+      },
+      selectedMode:false
     },
     series: [
       {
