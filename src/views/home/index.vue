@@ -62,7 +62,7 @@
         <PieChart
           id="disk"
           :color="color"
-          :data="data.disk"
+          :data="curDiskData"
           :fontSize="fontSize"
           :x="lineX"
           class="stretch"
@@ -79,7 +79,12 @@
           <div class="colHeader" title="已使用">已使用</div>
         </div>
         <div class="tables">
-          <div v-for="item in data.disk" :key="item.mounted_on" class="tr">
+          <div
+            v-for="item in data.disk"
+            :key="item.mounted_on"
+            :class="['tr', curDisk === item.mounted_on && 'active']"
+            @click="setCurDisk(item.mounted_on)"
+          >
             <span :title="item.available" class="tableData">{{
               item.available
             }}</span>
@@ -105,20 +110,19 @@
         <div id="blockTabs" class="stretch xflex">
           <div class="tabs">
             <div
-              v-for="item in netData"
-              :key="item.name"
-              :class="['tab', curTab === item.name && 'active']"
-              :title="item.name + `[${item.ipv4.join()}]`"
-              @click="curTab = item.name"
+              v-for="item in data.net"
+              :key="item.interface_name"
+              :class="['tab', curNet === item.interface_name && 'active']"
+              :title="item.interface_name + `[${item.ipv4.join()}]`"
+              @click="setCurNet(item.interface_name)"
             >
-              {{ item.name }}&nbsp;{{ item.ipv4 }}
+              {{ item.interface_name }}&nbsp;{{ item.ipv4 }}
             </div>
           </div>
           <NetChart
-            v-if="!!curTab"
             id="netLoad"
             :color="color"
-            :data="curData"
+            :data="curNetData"
             :fontSize="fontSize"
             :x="lineX"
             class="stretch"
@@ -144,19 +148,21 @@ const data = reactive({
   host: {},
   swap: {},
   disk: [],
-  load: {}
+  load: {},
+  net: []
 });
+// 颜色配置
 const color = reactive({
   front: "#fff",
   back: "#111",
   guage: ["#00e280", "#ffae3b", "#dd001f"]
 });
+// 字体配置
 const fontSize = reactive({
   titleSize: 25,
   bodySize: 20,
   descSize: 15
 });
-
 // CPU占用率
 const cpuRate = ref(0);
 //内存占用率
@@ -165,14 +171,64 @@ const memRate = ref(0);
 const swapRate = ref(0);
 // 负载
 const lineX = reactive([]);
-//网络负载
-const netData = reactive([]);
-// tab选中
-const curTab = ref();
-// 当前选中的数据，rx是下载
-const curData = computed(() => {
-  let obj = netData.find(v => v.name === curTab.value);
-  return obj;
+// tab选中网卡
+const curNet = ref("");
+//根据当前tab返回列表中的数据
+const curNetData = computed(() => {
+  let obj = data.net.find(v => v.interface_name === curNet.value);
+  if (obj) {
+    let rx = obj.rx.map(v => Number.parseFloat((v / 1024).toFixed(2)));
+    let tx = obj.tx.map(v => Number.parseFloat((v / 1024).toFixed(2)));
+    return {
+      rx,
+      tx
+    };
+  } else {
+    let rx = [];
+    let tx = [];
+    lineX.forEach((v, i) => {
+      let total = data.net.reduce(
+        (total, item) => {
+          total.rx += item.rx[i];
+          total.tx += item.tx[i];
+          return total;
+        },
+        {
+          rx: 0,
+          tx: 0
+        }
+      );
+      rx.push(Number.parseFloat((total.rx / 1024).toFixed(2)));
+      tx.push(Number.parseFloat((total.tx / 1024).toFixed(2)));
+    });
+    return {
+      rx,
+      tx
+    };
+  }
+});
+// 当前选中的硬盘
+const curDisk = ref("");
+const curDiskData = computed(() => {
+  let obj = data.disk.find(v => v.mounted_on === curDisk.value);
+  // 带百分号先转数字
+  if (obj) {
+    return {
+      use: Number.parseFloat(obj.use_percent),
+      unUse: Number.parseFloat(
+        (100 - Number.parseFloat(obj.use_percent)).toFixed(2)
+      )
+    };
+  } else {
+    let total = data.disk.reduce((count, item) => {
+      count += Number.parseFloat(item.use_percent);
+      return count;
+    }, 0);
+    return {
+      use: total,
+      unUse: Number.parseFloat((data.disk.length * 100 - total).toFixed(2))
+    };
+  }
 });
 //定时器id
 let timerId = undefined;
@@ -196,7 +252,6 @@ const loopGetData = async () => {
     loopGetData();
   }, 5 * 1000);
 };
-
 // 单位转换
 const convertUnit = (value = 0, unit = "") => {
   const units = ["PB", "TB", "GB", "MB", "KB", "B"];
@@ -227,17 +282,12 @@ const loadDashboardInfo = async () => {
     let res = await dashboardInfo();
     if (res.code === 0) {
       // 这里的结构是echart的series结构
-      netData.push(
-        ...res.data.net.map(v => ({
-          ...v,
-          name: v.interface_name,
-          data: {
-            rx: [],
-            tx: []
-          }
-        }))
-      );
-      curTab.value = netData.at().name;
+      data.net = res.data.net.map(v => ({
+        ...v,
+        // 下行
+        rx: [],
+        tx: []
+      }));
     } else {
       message(res.msg);
     }
@@ -263,8 +313,9 @@ const loadDashboardData = async () => {
           ((res.data.swap.used / res.data.swap.total) * 100).toFixed(2)
         );
       }
-      //折线图和负载图共享x轴
+      //共享x轴
       lineX.push(res.data.host.systime);
+      // 负载图
       Object.keys(res.data.load).forEach(key => {
         let dt = data.load[key];
         if (dt) {
@@ -276,12 +327,10 @@ const loadDashboardData = async () => {
       // 网络流量统计
       res.data.net.forEach(v => {
         let name = v.interface_name;
-        let currentData = netData.find(v => v.name === name);
+        let currentData = data.net.find(v => v.interface_name === name);
         if (currentData) {
-          const tx = Number.parseFloat((v.tx / 1024).toFixed(2));
-          const rx = Number.parseFloat((v.rx / 1024).toFixed(2));
-          currentData.data.rx.push(rx);
-          currentData.data.tx.push(tx);
+          currentData.rx.push(v.rx);
+          currentData.tx.push(v.tx);
         }
       });
       // 主机信息
@@ -296,6 +345,20 @@ const loadDashboardData = async () => {
     }
   } catch (err) {
     console.log(err);
+  }
+};
+const setCurNet = name => {
+  if (curNet.value === name) {
+    curNet.value = "";
+  } else {
+    curNet.value = name;
+  }
+};
+const setCurDisk = name => {
+  if (curDisk.value === name) {
+    curDisk.value = "";
+  } else {
+    curDisk.value = name;
   }
 };
 onMounted(async () => {

@@ -63,7 +63,7 @@ const initChart = () => {
       }
     },
     legend: {
-      data: Object.keys(props.data.data),
+      data: Object.keys(props.data),
       textStyle: {
         color: "#fff"
       },
@@ -105,15 +105,15 @@ const initChart = () => {
       }
     ],
     // 上行和下行的数据
-    series: Object.keys(props.data.data).map(v => ({
+    series: Object.keys(props.data).map(v => ({
       name: v,
       type: "line",
       emphasis: {
         focus: "series"
       },
-      showSymbol:false,
+      showSymbol: false,
       areaStyle: {},
-      data: props.data.data[v]
+      data: props.data[v]
     }))
   });
 };
@@ -137,9 +137,9 @@ onMounted(() => {
         xAxis: {
           data: n
         },
-        series: Object.keys(props.data.data).map(v => ({
+        series: Object.keys(props.data).map(v => ({
           name: v,
-          data: props.data.data[v]
+          data: props.data[v]
         }))
       });
     },
@@ -154,13 +154,13 @@ onMounted(() => {
         xAxis: {
           data: props.x
         },
-        series: Object.keys(props.data.data).map(v => ({
+        series: Object.keys(props.data).map(v => ({
           name: v,
           type: "line",
           emphasis: {
             focus: "series"
           },
-          data: n.data[v]
+          data: n[v]
         }))
       });
     },

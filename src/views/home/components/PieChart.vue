@@ -26,27 +26,9 @@ const props = defineProps({
     default: () => ({})
   },
   data: {
-    type: Array,
-    default: () => []
+    type: Object,
+    default: () => ({})
   }
-});
-const seriesData = computed(() => {
-  let use = 0;
-
-  props.data.forEach(v => {
-    use += parseFloat(v.use_percent);
-  });
-  let total = props.data.length * 100;
-  return [
-    {
-      name: "已使用",
-      value: use
-    },
-    {
-      name: "未使用",
-      value: total - use
-    }
-  ];
 });
 let chartDom;
 let rerenderStartTime = Date.now();
@@ -81,7 +63,16 @@ const initChart = () => {
           position: "inside",
           formatter: "{d}%"
         },
-        data: seriesData.value
+        data: [
+          {
+            name: "已使用",
+            value: props.data.use
+          },
+          {
+            name: "未使用",
+            value: props.data.unUse
+          }
+        ]
       }
     ]
   });
@@ -105,7 +96,16 @@ onMounted(() => {
       chartDom.setOption({
         series: [
           {
-            data: seriesData.value
+            data: [
+              {
+                name: "已使用",
+                value: n.use
+              },
+              {
+                name: "未使用",
+                value: n.unUse
+              }
+            ]
           }
         ]
       });
