@@ -111,6 +111,7 @@ const initChart = () => {
       emphasis: {
         focus: "series"
       },
+      areaStyle: {},
       data: props.data.data[v]
     }))
   });
@@ -137,10 +138,6 @@ onMounted(() => {
         },
         series: Object.keys(props.data.data).map(v => ({
           name: v,
-          type: "line",
-          emphasis: {
-            focus: "series"
-          },
           data: props.data.data[v]
         }))
       });

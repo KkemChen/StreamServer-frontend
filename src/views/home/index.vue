@@ -398,6 +398,23 @@ $heightRate: 9px;
       display: grid;
       column-gap: $spacing;
       grid-template-columns: repeat(6, 1fr);
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba($frontColor, 0.15);
+
+        & > .tableData {
+          background-color: rgba($frontColor, 0.3);
+        }
+      }
+    }
+
+    .active {
+      background-color: rgba($frontColor, 0.15);
+
+      & > .tableData {
+        background-color: rgba($frontColor, 0.3);
+      }
     }
 
     &::-webkit-scrollbar {

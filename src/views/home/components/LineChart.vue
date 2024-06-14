@@ -90,8 +90,7 @@ const initChart = () => {
     series: Object.keys(props.data).map(v => {
       return {
         name: v,
-        type: "bar",
-        barWidth: 3,
+        type: "line",
         data: props.data[v]
       };
     })
@@ -123,8 +122,7 @@ onMounted(() => {
         series: Object.keys(props.data).map(v => {
           return {
             name: v,
-            type: "bar",
-            barWidth: 3,
+            type: "line",
             data: props.data[v]
           };
         })
