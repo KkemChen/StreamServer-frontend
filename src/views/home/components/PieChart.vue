@@ -6,7 +6,7 @@
 //需要考虑loading怎么做
 import * as echarts from "echarts";
 import { watch } from "vue";
-import {  onMounted,  onUnmounted, defineProps,computed } from "vue";
+import { onMounted, onUnmounted, defineProps, computed } from "vue";
 
 const props = defineProps({
   id: {
@@ -16,6 +16,10 @@ const props = defineProps({
   color: {
     type: Object,
     default: () => ({})
+  },
+  x: {
+    type: Array,
+    default: () => []
   },
   fontSize: {
     type: Object,
@@ -28,58 +32,59 @@ const props = defineProps({
 });
 const seriesData = computed(() => {
   let use = 0;
-  props.data.forEach(v => { 
-    use+=parseFloat(v.use_percent)
-  })
-  let total = props.data.length * 100
+
+  props.data.forEach(v => {
+    use += parseFloat(v.use_percent);
+  });
+  let total = props.data.length * 100;
   return [
     {
-          name: '已使用',
-          value:use
-        },
-        {
-          name: '未使用',
-        value:total-use
-        }
-  ]
-})
+      name: "已使用",
+      value: use
+    },
+    {
+      name: "未使用",
+      value: total - use
+    }
+  ];
+});
 let chartDom;
 let rerenderStartTime = Date.now();
 const initChart = () => {
   chartDom.setOption({
     tooltip: {
-      trigger: 'item',
+      trigger: "item",
       formatter(args) {
-        return `${args.marker}${args.name}:${args.percent}%`
+        return `${args.marker}${args.name}:${args.percent}%`;
       }
     },
     legend: {
       show: true,
-      orient: 'vertical',
-    right: '5%',
-    top: 'center',
-    padding: 0,
-    textStyle: {
-      color:props.color.front
-    }
+      orient: "vertical",
+      right: "5%",
+      top: "center",
+      padding: 0,
+      textStyle: {
+        color: props.color.front
+      }
     },
     series: [
       {
-        type: 'pie',
-        radius: '90%',
-        center: ['50%', '50%'],
+        type: "pie",
+        radius: "90%",
+        center: ["50%", "50%"],
         labelLine: {
-          show:false
+          show: false
         },
         label: {
           show: true,
-          position: 'inside',
-          formatter:'{d}%'
+          position: "inside",
+          formatter: "{d}%"
         },
         data: seriesData.value
-      }]
-    }
-  );
+      }
+    ]
+  });
 };
 let watchDataId;
 const rerenderChart = () => {
@@ -100,7 +105,7 @@ onMounted(() => {
       chartDom.setOption({
         series: [
           {
-            data:seriesData.value
+            data: seriesData.value
           }
         ]
       });

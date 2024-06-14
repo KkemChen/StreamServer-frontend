@@ -4,7 +4,17 @@
 
 <script setup>
 import * as echarts from "echarts";
-import { ref, onMounted, nextTick, onUnmounted, defineProps,computed,watch, defineEmits, reactive } from "vue";
+import {
+  ref,
+  onMounted,
+  nextTick,
+  onUnmounted,
+  defineProps,
+  computed,
+  watch,
+  defineEmits,
+  reactive
+} from "vue";
 
 const props = defineProps({
   id: {
@@ -13,101 +23,79 @@ const props = defineProps({
   },
   x: {
     type: Array,
-    default:()=>[]
+    default: () => []
   },
-  min1: {
-    type: Array,
-    default:()=>[]
+  data: {
+    type: Object,
+    default: () => ({})
   },
-  min5: {
-    type: Array,
-    default:()=>[]
+  color: {
+    type: Object,
+    default: () => ({})
   },
-  min15: {
-    type: Array,
-    default:()=>[]
-  },
+  fontSize: {
+    type: Object,
+    default: () => ({})
+  }
 });
-const types = reactive(['min1', 'min5', 'min15'])
+
 let chartDom;
 let rerenderStartTime = Date.now();
 const initChart = () => {
   chartDom.setOption({
     title: {
-    show:false,
-    // text: 'Stacked Area Chart'
-  },
-  tooltip: {
-    trigger: 'axis',
-    axisPointer: {
-      type: 'cross',
-      label: {
-        backgroundColor: '#6a7985'
+      show: false
+    },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "cross",
+        label: {
+          backgroundColor: "#6a7985"
+        }
       }
-    }
-  },
-  legend: {
-    data: types,
-    textStyle: {
-      color:'#fff'
-    }
-  },
-  grid: {
-    left: '5%',
-    right: '10%',
-    bottom: '3%',
-    top:'10%',
-    containLabel: true
-  },
-  xAxis: [
-    {
-      type: 'category',
-      boundaryGap: false,
-      data: props.x,
-      axisLabel: {
-        color: '#fff',
-        margin:15
+    },
+    legend: {
+      data: Object.keys(props.data),
+      textStyle: {
+        color: "#fff"
       }
-    }
-  ],
-  yAxis: [
-    {
-      type: 'value',
-      axisLabel: {
-        color:'#fff'
+    },
+    grid: {
+      left: "5%",
+      right: "10%",
+      bottom: "3%",
+      top: "10%",
+      containLabel: true
+    },
+    xAxis: [
+      {
+        type: "category",
+        boundaryGap: false,
+        data: props.x,
+        axisLabel: {
+          color: "#fff",
+          margin: 15
+        }
       }
-    }
     ],
-  series: [
-    {
-      name: 'min1',
-      type: 'line',
-      areaStyle: {},
-      emphasis: {
-        focus: 'series'
-      },
-      data: props.min1
-    },
-    {
-      name: 'min5',
-      type: 'line',
-      areaStyle: {},
-      emphasis: {
-        focus: 'series'
-      },
-      data: props.min5
-    },
-    {
-      name: 'min15',
-      type: 'line',
-      areaStyle: {},
-      emphasis: {
-        focus: 'series'
-      },
-      data: props.min15
-    }
-  ]
-});
+    yAxis: [
+      {
+        type: "value",
+        axisLabel: {
+          color: "#fff"
+        }
+      }
+    ],
+    series: Object.keys(props.data).map(v => {
+      return {
+        name: v,
+        type: "bar",
+        barWidth: 3,
+        data: props.data[v]
+      };
+    })
+  });
 };
 let watchXId;
 const rerenderChart = () => {
@@ -129,18 +117,18 @@ onMounted(() => {
         xAxis: {
           data: n
         },
-        series: [
-          {
-            data: props.min1
-          },
-          {
-            data: props.min5
-          },
-          {
-            data: props.min15
-          }
-        ]
-      })
+        legend: {
+          data: Object.keys(props.data)
+        },
+        series: Object.keys(props.data).map(v => {
+          return {
+            name: v,
+            type: "bar",
+            barWidth: 3,
+            data: props.data[v]
+          };
+        })
+      });
     },
     {
       deep: true

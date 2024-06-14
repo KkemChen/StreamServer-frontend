@@ -21,27 +21,26 @@ const props = defineProps({
   color: {
     type: Object,
     default: () => ({
-      guage:[]
+      guage: []
     })
   },
   fontSize: {
     type: Object,
     default: () => ({})
-  },
+  }
 });
+
 let chartDom;
 let rerenderStartTime = Date.now();
-const getColor = (value) => { 
+const getColor = value => {
   if (value >= 85) {
-    return props.color.guage[2]
+    return props.color.guage[2];
+  } else if (value >= 55) {
+    return props.color.guage[1];
+  } else {
+    return props.color.guage[0];
   }
-  else if (value >= 55) {
-    return props.color.guage[1]
-  }
-  else { 
-    return props.color.guage[0]
-  }
-}
+};
 const initChart = () => {
   chartDom.setOption({
     series: [
@@ -53,7 +52,7 @@ const initChart = () => {
         min: 0,
         max: 100,
         splitNumber: 10,
-        radius: '150%',
+        radius: "150%",
         itemStyle: {
           color: getColor(props.data),
           shadowColor: "rgba(0,0,0,0.3)",
@@ -110,7 +109,7 @@ const initChart = () => {
             value: {
               fontSize: 20,
               fontWeight: "bolder",
-              color:getColor(props.data)
+              color: getColor(props.data)
             },
             unit: {
               fontSize: 20,
@@ -142,23 +141,23 @@ onMounted(() => {
   // data监听
   watchDataId = watch(
     () => props.data,
-    (value) => { 
+    value => {
       chartDom.setOption({
         series: [
           {
             detail: {
-          rich: {
-            value: {
-              color:getColor(props.data)
+              rich: {
+                value: {
+                  color: getColor(props.data)
+                },
+                unit: {
+                  color: getColor(props.data)
+                }
+              }
             },
-            unit: {
+            itemStyle: {
               color: getColor(props.data)
-            }
-          }
-        },
-             itemStyle: {
-          color: getColor(props.data),
-        },
+            },
             data: [
               {
                 value
