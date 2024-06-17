@@ -55,7 +55,13 @@
     <div class="fullWidth xgrid3 spacingBottom">
       <div class="contentBlock color yflex">
         <div class="blockTitle">负载情况</div>
-        <LineChart id="load" :data="data.load" :color="color" :x="lineX" class="stretch" />
+        <LineChart
+          id="load"
+          :color="color"
+          :data="data.load"
+          :x="lineX"
+          class="stretch"
+        />
       </div>
       <div class="contentBlock color yflex">
         <div class="blockTitle">磁盘总空间</div>
@@ -86,7 +92,7 @@
             @click="setCurDisk(item.mounted_on)"
           >
             <span :title="item.available" class="tableData">{{
-              convertUnit(item.available,'kb')
+              convertUnit(item.available, "kb")
             }}</span>
             <span :title="item.filesystem" class="tableData">{{
               item.filesystem
@@ -94,11 +100,15 @@
             <span :title="item.mounted_on" class="tableData">{{
               item.mounted_on
             }}</span>
-            <span :title="item.size" class="tableData">{{ convertUnit(item.size,'kb') }}</span>
+            <span :title="item.size" class="tableData">{{
+              convertUnit(item.size, "kb")
+            }}</span>
             <span :title="item.use_percent" class="tableData">{{
               item.use_percent
             }}</span>
-            <span :title="item.used" class="tableData">{{ convertUnit(item.used,'kb') }}</span>
+            <span :title="item.used" class="tableData">{{
+              convertUnit(item.used, "kb")
+            }}</span>
           </div>
         </div>
       </div>
@@ -141,7 +151,8 @@ import LineChart from "./components/LineChart.vue";
 import NetChart from "./components/NetChart.vue";
 import PieChart from "./components/PieChart.vue";
 import { message } from "@/utils/message";
-import { ref, onMounted, reactive, onUnmounted, computed,watch } from "vue";
+import { ref, onMounted, reactive, onUnmounted, computed, watch } from "vue";
+
 const { isDark } = useDark();
 const loading = ref(false);
 //数据
@@ -154,18 +165,20 @@ const data = reactive({
 });
 // 颜色配置
 const color = computed(() => {
-  return isDark.value ? {
-    front: "#fff",
-    back: "#000",
-    subBack:'#fff',
-    guage: ["#67C23A", "#E6A23C", "#F56C6C"]
-  } : {
-    front: "#000",
-      back: "#fff",
-    subBack:'#eee',
-    guage: ["#67C23A", "#E6A23C", "#F56C6C"]
-  }
-})
+  return isDark.value
+    ? {
+        front: "#fff",
+        back: "#000",
+        subBack: "#fff",
+        guage: ["#67C23A", "#E6A23C", "#F56C6C"]
+      }
+    : {
+        front: "#000",
+        back: "#fff",
+        subBack: "#eee",
+        guage: ["#67C23A", "#E6A23C", "#F56C6C"]
+      };
+});
 // 字体配置
 const fontSize = reactive({
   titleSize: 25,
@@ -220,22 +233,26 @@ const curNetData = computed(() => {
 const curDisk = ref("");
 const curDiskData = computed(() => {
   let obj = data.disk.find(v => v.mounted_on === curDisk.value);
-  // 带百分号先转数字
+  // 有obj则为选中
   if (obj) {
+    let used = Number.parseFloat(obj.used);
+    let available = Number.parseFloat(obj.available);
     return {
-      use: Number.parseFloat(obj.use_percent),
-      unUse: Number.parseFloat(
-        (100 - Number.parseFloat(obj.use_percent)).toFixed(2)
-      )
+      use: used,
+      unUse: available
     };
   } else {
-    let total = data.disk.reduce((count, item) => {
-      count += Number.parseFloat(item.use_percent);
+    let used = data.disk.reduce((count, item) => {
+      count += Number.parseFloat(item.used);
+      return count;
+    }, 0);
+    let available = data.disk.reduce((count, item) => {
+      count += Number.parseFloat(item.available);
       return count;
     }, 0);
     return {
-      use: total,
-      unUse: Number.parseFloat((data.disk.length * 100 - total).toFixed(2))
+      use: used,
+      unUse: available
     };
   }
 });
@@ -266,7 +283,7 @@ const convertUnit = (value = 0, unit = "") => {
   const units = ["PB", "TB", "GB", "MB", "KB", "B"];
   const convertValue = 1024;
   const hold = 2; //保留多少位
-  const NumberValue=Number.parseFloat(value)
+  const NumberValue = Number.parseFloat(value);
   // 值和单位
   let upUnit = unit.toUpperCase(); //大写单位
   if (units.includes(upUnit)) {
@@ -346,9 +363,9 @@ const loadDashboardData = async () => {
       data.host = res.data.host;
       data.host.os_version = res.data.host.os_version.replace(/\s+.*$/g, "");
       //虚拟内存
-      data.swap = res.data.swap??[];
+      data.swap = res.data.swap ?? [];
       //磁盘信息
-      data.disk = res.data.disk??[];
+      data.disk = res.data.disk ?? [];
     } else {
       message(res.msg);
     }
