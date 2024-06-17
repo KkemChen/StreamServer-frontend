@@ -308,7 +308,7 @@ const loadDashboardInfo = async () => {
   try {
     let res = await dashboardInfo();
     if (res.code === 0) {
-      data.net = res.data.net.map(v => ({
+      data.net = (res?.data?.net ?? []).map(v => ({
         ...v,
         // 下行
         rx: [],
@@ -326,23 +326,33 @@ const loadDashboardData = async () => {
     let res = await dashboardData();
     if (res.code === 0) {
       // cpu占用率
-      cpuRate.value = Number.parseFloat((100 - res.data.cpu.idle).toFixed(2));
+      cpuRate.value = Number.parseFloat(
+        (100 - (res?.data?.cpu?.idle ?? 0)).toFixed(2)
+      );
       // 内存比率
       memRate.value = Number.parseFloat(
-        ((res.data.mem.used / res.data.mem.total) * 100).toFixed(2)
+        (
+          ((res?.data?.mem?.used ?? 0) / (res?.data?.mem?.total ?? 0)) *
+          100
+        ).toFixed(2)
       );
       // 虚拟内存占用
-      if (res.data.swap.total === 0) {
+      if (res?.data?.swap?.total === 0) {
         swapRate.value = 0;
       } else {
         swapRate.value = Number.parseFloat(
-          ((res.data.swap.used / res.data.swap.total) * 100).toFixed(2)
+          (
+            ((res?.data?.swap?.used ?? 0) / (res?.data?.swap?.total ?? 0)) *
+            100
+          ).toFixed(2)
         );
       }
       //共享x轴
-      lineX.push(res.data.host.systime);
+      if (res?.data?.host?.systime) {
+        lineX.push(res.data.host.systime);
+      }
       // 负载图
-      Object.keys(res.data.load).forEach(key => {
+      Object.keys(res?.data?.load).forEach(key => {
         let dt = data.load[key];
         if (dt) {
           data.load[key].push(res.data.load[key]);
@@ -351,7 +361,7 @@ const loadDashboardData = async () => {
         }
       });
       // 网络流量统计
-      res.data.net.forEach(v => {
+      (res.data?.net ?? []).forEach(v => {
         let name = v.interface_name;
         let currentData = data.net.find(v => v.interface_name === name);
         if (currentData) {
@@ -360,12 +370,12 @@ const loadDashboardData = async () => {
         }
       });
       // 主机信息
-      data.host = res.data.host;
-      data.host.os_version = res.data.host.os_version.replace(/\s+.*$/g, "");
+      data.host = res.data?.host;
+      data.host.os_version = res.data?.host.os_version.replace(/\s+.*$/g, "");
       //虚拟内存
-      data.swap = res.data.swap ?? [];
+      data.swap = res.data?.swap ?? [];
       //磁盘信息
-      data.disk = res.data.disk ?? [];
+      data.disk = res.data?.disk ?? [];
     } else {
       message(res.msg);
     }
