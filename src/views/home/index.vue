@@ -55,7 +55,7 @@
     <div class="fullWidth xgrid3 spacingBottom">
       <div class="contentBlock color yflex">
         <div class="blockTitle">负载情况</div>
-        <LineChart id="load" :data="data.load" :x="lineX" class="stretch" />
+        <LineChart id="load" :data="data.load" :color="color" :x="lineX" class="stretch" />
       </div>
       <div class="contentBlock color yflex">
         <div class="blockTitle">磁盘总空间</div>
@@ -86,7 +86,7 @@
             @click="setCurDisk(item.mounted_on)"
           >
             <span :title="item.available" class="tableData">{{
-              item.available
+              convertUnit(item.available,'kb')
             }}</span>
             <span :title="item.filesystem" class="tableData">{{
               item.filesystem
@@ -94,11 +94,11 @@
             <span :title="item.mounted_on" class="tableData">{{
               item.mounted_on
             }}</span>
-            <span :title="item.size" class="tableData">{{ item.size }}</span>
+            <span :title="item.size" class="tableData">{{ convertUnit(item.size,'kb') }}</span>
             <span :title="item.use_percent" class="tableData">{{
               item.use_percent
             }}</span>
-            <span :title="item.used" class="tableData">{{ item.used }}</span>
+            <span :title="item.used" class="tableData">{{ convertUnit(item.used,'kb') }}</span>
           </div>
         </div>
       </div>
@@ -134,14 +134,15 @@
 </template>
 
 <script setup>
+import { useDark } from "@pureadmin/utils";
 import { dashboardInfo, dashboardData } from "@/api/sysinfo";
 import GaugeChart from "./components/GaugeChart.vue";
 import LineChart from "./components/LineChart.vue";
 import NetChart from "./components/NetChart.vue";
 import PieChart from "./components/PieChart.vue";
 import { message } from "@/utils/message";
-import { ref, onMounted, reactive, onUnmounted, computed } from "vue";
-
+import { ref, onMounted, reactive, onUnmounted, computed,watch } from "vue";
+const { isDark } = useDark();
 const loading = ref(false);
 //数据
 const data = reactive({
@@ -152,11 +153,19 @@ const data = reactive({
   net: []
 });
 // 颜色配置
-const color = reactive({
-  front: "#fff",
-  back: "#111",
-  guage: ["#00e280", "#ffae3b", "#dd001f"]
-});
+const color = computed(() => {
+  return isDark.value ? {
+    front: "#fff",
+    back: "#000",
+    subBack:'#fff',
+    guage: ["#67C23A", "#E6A23C", "#F56C6C"]
+  } : {
+    front: "#000",
+      back: "#fff",
+    subBack:'#eee',
+    guage: ["#67C23A", "#E6A23C", "#F56C6C"]
+  }
+})
 // 字体配置
 const fontSize = reactive({
   titleSize: 25,
@@ -257,14 +266,15 @@ const convertUnit = (value = 0, unit = "") => {
   const units = ["PB", "TB", "GB", "MB", "KB", "B"];
   const convertValue = 1024;
   const hold = 2; //保留多少位
+  const NumberValue=Number.parseFloat(value)
   // 值和单位
   let upUnit = unit.toUpperCase(); //大写单位
   if (units.includes(upUnit)) {
     let startIndex = units.findIndex(v => v === upUnit);
-    if (startIndex === 0 || value < convertValue) {
-      return `${Number.parseFloat(value.toFixed(hold))}${upUnit}`;
+    if (startIndex === 0 || NumberValue < convertValue) {
+      return `${Number.parseFloat(NumberValue.toFixed(hold))}${upUnit}`;
     } else {
-      let result = value,
+      let result = NumberValue,
         resultUnit = upUnit;
       while (result > convertValue && startIndex !== 0) {
         result = result / convertValue;
@@ -274,14 +284,13 @@ const convertUnit = (value = 0, unit = "") => {
       return `${Number.parseFloat(result.toFixed(hold))}${resultUnit}`;
     }
   } else {
-    return `${Number.parseFloat(value.toFixed(hold))}${upUnit}`;
+    return `${Number.parseFloat(NumberValue.toFixed(hold))}${upUnit}`;
   }
 };
 const loadDashboardInfo = async () => {
   try {
     let res = await dashboardInfo();
     if (res.code === 0) {
-      // 这里的结构是echart的series结构
       data.net = res.data.net.map(v => ({
         ...v,
         // 下行
@@ -292,7 +301,7 @@ const loadDashboardInfo = async () => {
       message(res.msg);
     }
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 };
 const loadDashboardData = async () => {
@@ -329,22 +338,22 @@ const loadDashboardData = async () => {
         let name = v.interface_name;
         let currentData = data.net.find(v => v.interface_name === name);
         if (currentData) {
-          currentData.rx.push(v.rx);
-          currentData.tx.push(v.tx);
+          currentData.rx.push(v.rx_speed);
+          currentData.tx.push(v.tx_speed);
         }
       });
       // 主机信息
       data.host = res.data.host;
       data.host.os_version = res.data.host.os_version.replace(/\s+.*$/g, "");
       //虚拟内存
-      data.swap = res.data.swap;
+      data.swap = res.data.swap??[];
       //磁盘信息
-      data.disk = res.data.disk;
+      data.disk = res.data.disk??[];
     } else {
       message(res.msg);
     }
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 };
 const setCurNet = name => {
@@ -377,10 +386,10 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-$backColor: #111;
-$frontColor: #fff;
+$backColor: var(--el-bg-color);
+$frontColor: var(--el-text-color-primary);
 $spacing: 10px;
-$radius: 5px;
+$radius: 3px;
 $titleSize: 25px;
 $bodySize: 20px;
 $descSize: 15px;
@@ -464,19 +473,15 @@ $heightRate: 9px;
       cursor: pointer;
 
       &:hover {
-        background-color: rgba($frontColor, 0.15);
-
         & > .tableData {
-          background-color: rgba($frontColor, 0.3);
+          background-color: var(--el-text-color-placeholder);
         }
       }
     }
 
     .active {
-      background-color: rgba($frontColor, 0.15);
-
       & > .tableData {
-        background-color: rgba($frontColor, 0.3);
+        background-color: var(--el-text-color-placeholder);
       }
     }
 
@@ -574,17 +579,17 @@ $heightRate: 9px;
         color: $frontColor;
         font-size: $bodySize;
         margin-bottom: $spacing;
-        background-color: rgba($frontColor, 0.05);
+        background-color: var(--el-fill-color);
         padding: $spacing;
         border-radius: $radius;
 
         &:hover {
-          background-color: rgba($frontColor, 0.3);
+          background-color: var(--el-text-color-placeholder);
         }
       }
 
       .active {
-        background-color: rgba($frontColor, 0.3);
+        background-color: var(--el-text-color-placeholder);
       }
     }
   }

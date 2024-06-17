@@ -78,7 +78,7 @@ const initChart = () => {
     ]
   });
 };
-let watchDataId;
+let watchDataId,watchColorId;
 const rerenderChart = () => {
   let time = Date.now();
   // 节流
@@ -115,11 +115,21 @@ onMounted(() => {
       deep: true
     }
   );
+  watchColorId = watch(() => props.color, value => {
+    chartDom.setOption({
+    legend: {
+      textStyle: {
+        color: value.front
+      },
+    },
+  });
+  })
   initChart();
   window.addEventListener("resize", rerenderChart);
 });
 onUnmounted(() => {
   watchDataId();
+  watchColorId()
   window.removeEventListener("resize", rerenderChart);
 });
 </script>

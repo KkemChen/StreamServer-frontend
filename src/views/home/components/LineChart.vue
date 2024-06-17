@@ -51,14 +51,15 @@ const initChart = () => {
       axisPointer: {
         type: "cross",
         label: {
-          backgroundColor: "#6a7985"
+          color:props.color.back,
+          backgroundColor:props.color.front
         }
       }
     },
     legend: {
       data: Object.keys(props.data),
       textStyle: {
-        color: "#fff"
+        color: props.color.front
       }
     },
     grid: {
@@ -74,7 +75,7 @@ const initChart = () => {
         boundaryGap: false,
         data: props.x,
         axisLabel: {
-          color: "#fff",
+          color: props.color.front,
           margin: 15
         }
       }
@@ -83,7 +84,7 @@ const initChart = () => {
       {
         type: "value",
         axisLabel: {
-          color: "#fff"
+          color: props.color.front
         }
       }
     ],
@@ -96,7 +97,7 @@ const initChart = () => {
     })
   });
 };
-let watchXId;
+let watchXId,watchColorId;
 const rerenderChart = () => {
   let time = Date.now();
   // 节流
@@ -133,11 +134,44 @@ onMounted(() => {
       deep: true
     }
   );
+  watchColorId = watch(() => props.color, value => {
+    chartDom.setOption({
+    tooltip: {
+      axisPointer: {
+        label: {
+          color:value.back,
+          backgroundColor:value.front
+        }
+      }
+    },
+    legend: {
+      textStyle: {
+        color: value.front
+      }
+    },
+    xAxis: [
+      {
+        axisLabel: {
+          color: value.front,
+        }
+      }
+    ],
+    yAxis: [
+      {
+        type: "value",
+        axisLabel: {
+          color: value.front
+        }
+      }
+    ]
+  });
+  })
   initChart();
   window.addEventListener("resize", rerenderChart);
 });
 onUnmounted(() => {
   watchXId();
+  watchColorId()
   window.removeEventListener("resize", rerenderChart);
 });
 </script>
