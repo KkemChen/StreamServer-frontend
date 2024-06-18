@@ -2,8 +2,8 @@ const { VITE_HIDE_HOME } = import.meta.env;
 const Layout = () => import("@/layout/index.vue");
 
 export default {
-  path: "/log",
-  name: "Log",
+  path: "/logs",
+  name: "Logs",
   component: Layout,
   redirect: "/log",
   meta: {
