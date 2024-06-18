@@ -127,7 +127,7 @@ export function useDataThemeChange() {
     toggleClass(Weak, "html-weakness", document.querySelector("html"));
     router.push("/home");
     useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
-    resetRouter();
+    // resetRouter();
   }
 
   return {
