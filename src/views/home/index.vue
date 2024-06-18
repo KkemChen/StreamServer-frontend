@@ -243,12 +243,10 @@ const curDiskData = computed(() => {
     };
   } else {
     let used = data.disk.reduce((count, item) => {
-      count += Number.parseFloat(item.used);
-      return count;
+      return count + Number.parseFloat(item.used);
     }, 0);
     let available = data.disk.reduce((count, item) => {
-      count += Number.parseFloat(item.available);
-      return count;
+      return count + Number.parseFloat(item.available);
     }, 0);
     return {
       use: used,
