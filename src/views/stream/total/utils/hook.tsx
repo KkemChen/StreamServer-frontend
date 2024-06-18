@@ -150,7 +150,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       type: "index",
       noExport: true,
       index(id) {
-        return (pagination.currentPage - 1) * pagination.pageSize + id + 1
+        return (pagination.currentPage - 1) * pagination.pageSize + id + 1;
       },
       width: 80
     },
@@ -288,9 +288,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     }
   ];
   if (hideCol.length === 0) {
-    hideCol = columns.filter(v => !v.hide).map(v => v.label)
+    hideCol = columns.filter(v => !v.hide).map(v => v.label);
   }
   const exportFileds: any = ref(columns.filter(v => !v.noExport));
+  //导出弹窗里的
   const checkedFileds: any = ref(exportFileds.value.map(v => v.prop));
   exportFileds.value.push(
     {
@@ -388,10 +389,11 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       });
   } */
 
-  function handleUpdate(row) { }
+  function handleUpdate(row) {}
 
   async function handleDelete(row) {
     message(`您删除了ID: ${row.id}的这条数据`, { type: "success" });
+    tableRef.value.getTableRef().toggleRowSelection(row, false);
     await delStreamInfo(toRaw(row));
     fetchAll();
   }
@@ -607,7 +609,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         vendor: vendor,
         streamType: streamType,
         ip: `${v["ip地址"] || ""}`,
-        url: `${v["取流地址"] || ''}`
+        url: `${v["取流地址"] || ""}`
         // status: {
         //   live: false,
         //   playerCount: 0
@@ -665,7 +667,9 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   ): Boolean {
     return files.every((item: any) => {
       let fileType = item.name.match(/\.\w+$/g);
-      return item.size <= size && (fileType.length > 0 && type.includes(fileType[0]))
+      return (
+        item.size <= size && fileType.length > 0 && type.includes(fileType[0])
+      );
       // if (fileType.length > 0) {
       //   return type.includes(fileType[0]);
       // } else {
@@ -711,8 +715,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         // maps.streamTypes.includes(streamType) &&
         // maps.streamModes.includes(streamMode) &&
         // maps.vendors.includes(vendor) &&
-        /^[a-zA-Z0-9]+$/.test(`${item["视频流ID"] || ''}`) &&
-        item["取流地址"];
+        /^[a-zA-Z0-9]+$/.test(`${item["视频流ID"] || ""}`) && item["取流地址"];
       if (!has) {
         index = i + 1;
         break;

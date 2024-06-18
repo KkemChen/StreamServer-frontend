@@ -151,7 +151,7 @@ import LineChart from "./components/LineChart.vue";
 import NetChart from "./components/NetChart.vue";
 import PieChart from "./components/PieChart.vue";
 import { message } from "@/utils/message";
-import { ref, onMounted, reactive, onUnmounted, computed, watch } from "vue";
+import { ref, onMounted, reactive, onUnmounted, computed } from "vue";
 
 const { isDark } = useDark();
 const loading = ref(false);
@@ -585,7 +585,6 @@ $heightRate: 9px;
     height: $heightRate * $rate;
 
     .tabs {
-      width: max-content;
       max-width: 400px;
       width: 100%;
       height: 100%;

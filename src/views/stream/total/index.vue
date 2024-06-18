@@ -75,7 +75,6 @@ let flvPlayer = null;
 
 const setLiveDotColor = color => {
   if (color == "#b7daff") {
-    
   }
   const liveDot = document.querySelector(".dplayer-live-dot");
   if (liveDot) {
@@ -106,8 +105,6 @@ function initPlayer(hasAudio) {
     }
   });
 
-  
-
   dp.on("pause", () => setLiveDotColor("#b7daff"));
 
   dp.on("loadeddata", function () {
@@ -125,8 +122,7 @@ function initPlayer(hasAudio) {
         flvPlayer.play();
         setTimeout(() => {
           setLiveDotColor("#ff0000");
-        },0)
-        
+        }, 0);
       });
     }
   });
