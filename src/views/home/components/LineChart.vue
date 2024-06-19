@@ -51,8 +51,8 @@ const initChart = () => {
       axisPointer: {
         type: "cross",
         label: {
-          color:props.color.back,
-          backgroundColor:props.color.front
+          color: props.color.back,
+          backgroundColor: props.color.front
         }
       }
     },
@@ -97,7 +97,7 @@ const initChart = () => {
     })
   });
 };
-let watchXId,watchColorId;
+let watchXId, watchColorId;
 const rerenderChart = () => {
   let time = Date.now();
   // 节流
@@ -124,7 +124,7 @@ onMounted(() => {
           return {
             name: v,
             type: "line",
-            showSymbol:false,
+            showSymbol: false,
             data: props.data[v]
           };
         })
@@ -134,44 +134,47 @@ onMounted(() => {
       deep: true
     }
   );
-  watchColorId = watch(() => props.color, value => {
-    chartDom.setOption({
-    tooltip: {
-      axisPointer: {
-        label: {
-          color:value.back,
-          backgroundColor:value.front
-        }
-      }
-    },
-    legend: {
-      textStyle: {
-        color: value.front
-      }
-    },
-    xAxis: [
-      {
-        axisLabel: {
-          color: value.front,
-        }
-      }
-    ],
-    yAxis: [
-      {
-        type: "value",
-        axisLabel: {
-          color: value.front
-        }
-      }
-    ]
-  });
-  })
+  watchColorId = watch(
+    () => props.color,
+    value => {
+      chartDom.setOption({
+        tooltip: {
+          axisPointer: {
+            label: {
+              color: value.back,
+              backgroundColor: value.front
+            }
+          }
+        },
+        legend: {
+          textStyle: {
+            color: value.front
+          }
+        },
+        xAxis: [
+          {
+            axisLabel: {
+              color: value.front
+            }
+          }
+        ],
+        yAxis: [
+          {
+            type: "value",
+            axisLabel: {
+              color: value.front
+            }
+          }
+        ]
+      });
+    }
+  );
   initChart();
   window.addEventListener("resize", rerenderChart);
 });
 onUnmounted(() => {
   watchXId();
-  watchColorId()
+  watchColorId();
   window.removeEventListener("resize", rerenderChart);
 });
 </script>

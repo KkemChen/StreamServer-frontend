@@ -49,7 +49,7 @@ const initChart = () => {
       textStyle: {
         color: props.color.front
       },
-      selectedMode:false
+      selectedMode: false
     },
     series: [
       {
@@ -62,7 +62,10 @@ const initChart = () => {
         label: {
           show: true,
           position: "inside",
-          formatter: "{d}%"
+          formatter: "{d}%",
+          textStyle: {
+            color: "#fff"
+          }
         },
         data: [
           {
@@ -78,7 +81,7 @@ const initChart = () => {
     ]
   });
 };
-let watchDataId,watchColorId;
+let watchDataId, watchColorId;
 const rerenderChart = () => {
   let time = Date.now();
   // 节流
@@ -115,21 +118,24 @@ onMounted(() => {
       deep: true
     }
   );
-  watchColorId = watch(() => props.color, value => {
-    chartDom.setOption({
-    legend: {
-      textStyle: {
-        color: value.front
-      },
-    },
-  });
-  })
+  watchColorId = watch(
+    () => props.color,
+    value => {
+      chartDom.setOption({
+        legend: {
+          textStyle: {
+            color: value.front
+          }
+        }
+      });
+    }
+  );
   initChart();
   window.addEventListener("resize", rerenderChart);
 });
 onUnmounted(() => {
   watchDataId();
-  watchColorId()
+  watchColorId();
   window.removeEventListener("resize", rerenderChart);
 });
 </script>

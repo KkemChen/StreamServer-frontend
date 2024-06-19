@@ -434,14 +434,6 @@ $heightRate: 9px;
     border-radius: $radius;
   }
 
-  .marginCenter {
-    margin: 0 auto;
-  }
-
-  .spacingTop {
-    margin-top: $spacing;
-  }
-
   .spacingBottom {
     margin-bottom: $spacing;
   }
@@ -489,6 +481,8 @@ $heightRate: 9px;
     width: 100%;
     max-height: $heightRate * 30;
     overflow: auto;
+    padding-right: $spacing;
+    box-sizing: border-box;
 
     .tr {
       margin-bottom: $spacing;
@@ -496,22 +490,20 @@ $heightRate: 9px;
       column-gap: $spacing;
       grid-template-columns: repeat(6, 1fr);
       cursor: pointer;
+      border-radius: $radius;
+      border-bottom: 1px solid var(--el-fill-color);
+
+      &:last-child {
+        border-bottom: none;
+      }
 
       &:hover {
-        & > .tableData {
-          background-color: var(--el-text-color-placeholder);
-        }
+        background-color: var(--el-fill-color);
       }
     }
 
     .active {
-      & > .tableData {
-        background-color: var(--el-text-color-placeholder);
-      }
-    }
-
-    &::-webkit-scrollbar {
-      display: none;
+      background-color: var(--el-fill-color);
     }
 
     .tableData {
@@ -551,10 +543,6 @@ $heightRate: 9px;
     }
   }
 
-  .spacingRight {
-    margin-right: $spacing;
-  }
-
   .GaugeChart {
     $rate: 20;
     min-width: $widthRate * $rate;
@@ -579,7 +567,7 @@ $heightRate: 9px;
   }
 
   #blockTabs {
-    $rate: 45;
+    $rate: 35;
     width: 100%;
     margin-top: $spacing;
     height: $heightRate * $rate;
@@ -589,10 +577,8 @@ $heightRate: 9px;
       width: 100%;
       height: 100%;
       overflow: auto;
-
-      &::-webkit-scrollbar {
-        display: none;
-      }
+      box-sizing: border-box;
+      padding-right: $spacing;
 
       .tab {
         overflow: hidden;
@@ -608,12 +594,12 @@ $heightRate: 9px;
         border-radius: $radius;
 
         &:hover {
-          background-color: var(--el-text-color-placeholder);
+          background-color: var(--el-border-color);
         }
       }
 
       .active {
-        background-color: var(--el-text-color-placeholder);
+        background-color: var(--el-border-color);
       }
     }
   }
