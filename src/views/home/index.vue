@@ -198,21 +198,17 @@ const curNet = ref("");
 //根据当前tab返回列表中的数据
 const curNetData = computed(() => {
   let obj = data.net.find(v => v.interface_name === curNet.value);
+  let rx = [];
+  let tx = [];
   if (obj) {
-    let rx = obj.rx.map(v => Number.parseFloat((v / 1024).toFixed(2)));
-    let tx = obj.tx.map(v => Number.parseFloat((v / 1024).toFixed(2)));
-    return {
-      rx,
-      tx
-    };
+    rx = obj.rx.map(v => Number.parseFloat((v / 1024).toFixed(2)));
+    tx = obj.tx.map(v => Number.parseFloat((v / 1024).toFixed(2)));
   } else {
-    let rx = [];
-    let tx = [];
     lineX.forEach((v, i) => {
       let total = data.net.reduce(
         (total, item) => {
-          total.rx += item.rx[i];
-          total.tx += item.tx[i];
+          total.rx = total.rx + (item.rx[i] || 0);
+          total.tx = total.tx + (item.tx[i] || 0);
           return total;
         },
         {
@@ -223,11 +219,11 @@ const curNetData = computed(() => {
       rx.push(Number.parseFloat((total.rx / 1024).toFixed(2)));
       tx.push(Number.parseFloat((total.tx / 1024).toFixed(2)));
     });
-    return {
-      rx,
-      tx
-    };
   }
+  return {
+    rx,
+    tx
+  };
 });
 // 当前选中的硬盘
 const curDisk = ref("");
@@ -310,6 +306,7 @@ const loadDashboardInfo = async () => {
         ...v,
         // 下行
         rx: [],
+        // 上行
         tx: []
       }));
     } else {
@@ -360,12 +357,15 @@ const loadDashboardData = async () => {
       });
       // 网络流量统计
       (res.data.net ?? []).forEach(v => {
-        let name = v.interface_name;
-        let currentData = data.net.find(v => v.interface_name === name);
-        if (currentData) {
-          currentData.rx.push(v.rx_speed);
-          currentData.tx.push(v.tx_speed);
-        }
+        data.net.some(item => {
+          if (item.interface_name === v.interface_name) {
+            item.rx.push(v.rx_speed);
+            item.tx.push(v.tx_speed);
+            return true;
+          } else {
+            return false;
+          }
+        });
       });
       // 主机信息
       data.host = res.data.host;
