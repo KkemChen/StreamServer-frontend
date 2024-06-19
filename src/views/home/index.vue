@@ -347,7 +347,7 @@ const loadDashboardData = async () => {
         lineX.push(res.data.host.systime);
       }
       // 负载图
-      Object.keys(res.data.load).forEach(key => {
+      Object.keys(res.data.load ?? {}).forEach(key => {
         let dt = data.load[key];
         if (dt) {
           data.load[key].push(res.data.load[key]);
@@ -368,8 +368,8 @@ const loadDashboardData = async () => {
         });
       });
       // 主机信息
-      data.host = res.data.host;
-      data.host.os_version = res.data.host.os_version?.replace(/\s+.*$/g, "");
+      data.host = res.data.host ?? {};
+      data.host.os_version = data.host?.os_version?.replace(/\s+.*$/g, "");
       //虚拟内存
       data.swap = res.data?.swap ?? [];
       //磁盘信息
