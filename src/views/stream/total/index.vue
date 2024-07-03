@@ -38,6 +38,7 @@ const {
   loading,
   columns,
   dataList,
+  streamInfo,
   // treeData,
   // treeLoading,
   selectedNum,
@@ -57,9 +58,7 @@ const {
   // handleUpload,
   // handleReset,
   // handleRole,
-  handleSizeChange,
   onSelectionCancel,
-  handleCurrentChange,
   handleSelectionChange,
   uploadLoading,
   checkedFileds,
@@ -72,7 +71,24 @@ const playDialogVisible = ref(false);
 const videoUrl = ref("");
 let dp = null;
 let flvPlayer = null;
-
+const sortChange = args => {
+  if (args.order === "ascending") {
+    // 升序
+    streamInfo.list = streamInfo.list.sort((a, b) => {
+      return a[args.prop]?.localeCompare(b[args.prop]);
+    });
+  } else if (args.order === "descending") {
+    //   降序
+    streamInfo.list = streamInfo.list.sort((a, b) => {
+      return b[args.prop]?.localeCompare(a[args.prop]);
+    });
+  } else {
+    //默认按照创建时间排序
+    streamInfo.list = streamInfo.list.sort((a, b) => {
+      return b.createTime?.localeCompare(a.createTime);
+    });
+  }
+};
 const setLiveDotColor = color => {
   if (color == "#b7daff") {
   }
@@ -200,6 +216,7 @@ const play = (id: String) => {
             class="!w-[180px]"
             clearable
             placeholder="请输入名称"
+            @keyup.enter.native="onSearch(form)"
           />
         </el-form-item>
         <el-form-item label="ID" prop="id">
@@ -208,6 +225,7 @@ const play = (id: String) => {
             class="!w-[180px]"
             clearable
             placeholder="请输入ID"
+            @keyup.enter.native="onSearch(form)"
           />
         </el-form-item>
         <el-form-item label="IP" prop="ip">
@@ -216,6 +234,7 @@ const play = (id: String) => {
             class="!w-[180px]"
             clearable
             placeholder="请输入IP地址"
+            @keyup.enter.native="onSearch(form)"
           >
             <el-option label="已开启" value="1" />
             <el-option label="已关闭" value="0" />
@@ -316,9 +335,8 @@ const play = (id: String) => {
             border
             row-key="id"
             table-layout="auto"
+            @sort-change="sortChange"
             @selection-change="handleSelectionChange"
-            @page-size-change="handleSizeChange"
-            @page-current-change="handleCurrentChange"
           >
             <template #operation="{ row }">
               <el-button
@@ -470,6 +488,7 @@ const play = (id: String) => {
           <el-checkbox
             v-for="item in exportFileds"
             :key="item.prop"
+            :disabled="!item.disabled"
             :label="item.label"
             :value="item.prop"
           />
