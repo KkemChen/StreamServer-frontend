@@ -212,21 +212,21 @@ const play = (id: String) => {
         :model="form"
         class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
       >
-        <el-form-item label="名称" prop="cameraName">
+        <el-form-item label="视频流名称" prop="cameraName">
           <el-input
             v-model="form.name"
             class="!w-[180px]"
             clearable
-            placeholder="请输入名称"
+            placeholder="请输入视频流名称"
             @keyup.enter="onSearch(form)"
           />
         </el-form-item>
-        <el-form-item label="ID" prop="id">
+        <el-form-item label="视频流ID" prop="id">
           <el-input
             v-model="form.id"
             class="!w-[180px]"
             clearable
-            placeholder="请输入ID"
+            placeholder="请输入视频流ID"
             @keyup.enter="onSearch(form)"
           />
         </el-form-item>
