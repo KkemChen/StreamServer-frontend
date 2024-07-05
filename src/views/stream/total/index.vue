@@ -218,7 +218,7 @@ const play = (id: String) => {
             class="!w-[180px]"
             clearable
             placeholder="请输入名称"
-            @keyup.enter.native="onSearch(form)"
+            @keyup.enter="onSearch(form)"
           />
         </el-form-item>
         <el-form-item label="ID" prop="id">
@@ -227,7 +227,7 @@ const play = (id: String) => {
             class="!w-[180px]"
             clearable
             placeholder="请输入ID"
-            @keyup.enter.native="onSearch(form)"
+            @keyup.enter="onSearch(form)"
           />
         </el-form-item>
         <el-form-item label="IP" prop="ip">
@@ -236,7 +236,7 @@ const play = (id: String) => {
             class="!w-[180px]"
             clearable
             placeholder="请输入IP地址"
-            @keyup.enter.native="onSearch(form)"
+            @keyup.enter="onSearch(form)"
           />
         </el-form-item>
         <el-form-item label="设备产商" prop="vendor">
