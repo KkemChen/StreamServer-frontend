@@ -60,7 +60,7 @@ const initChart = () => {
         }
       },
       formatter(args) {
-        return `${args[0].axisValueLabel}<br/>${args.map(v => `${v.marker} ${keyMap[v.seriesName]}：${v.value}KB`).join("<br/>")}`;
+        return `${args[0].axisValueLabel}<br/>${args.map(v => `${v.marker} ${keyMap[v.seriesName]}：${v.value}%`).join("<br/>")}`;
       }
     },
     legend: {
@@ -92,9 +92,10 @@ const initChart = () => {
     ],
     yAxis: [
       {
-        name: "（KB）",
+        name: "（%）",
         nameLocation: "end",
         nameGap: 20,
+        max: 100,
         nameTextStyle: {
           color: props.color.front,
           padding: [0, 20, 0, 0]

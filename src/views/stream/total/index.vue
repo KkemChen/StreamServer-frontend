@@ -31,6 +31,8 @@ const formRef = ref();
 const tableRef = ref();
 
 const {
+  streamTypes,
+  vendorImages,
   downloadData,
   form,
   detailVisible,
@@ -235,10 +237,41 @@ const play = (id: String) => {
             clearable
             placeholder="请输入IP地址"
             @keyup.enter.native="onSearch(form)"
+          />
+        </el-form-item>
+        <el-form-item label="设备产商" prop="vendor">
+          <el-select
+            v-model="form.vendor"
+            class="!w-[180px]"
+            clearable
+            placeholder="请选择设备产商"
+            @change="onSearch(form)"
+            @clear="onSearch(form)"
           >
-            <el-option label="已开启" value="1" />
-            <el-option label="已关闭" value="0" />
-          </el-input>
+            <el-option
+              v-for="(item, index) in vendorImages"
+              :key="index"
+              :label="item.name"
+              :value="index"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="码流类型" prop="streamType">
+          <el-select
+            v-model="form.streamType"
+            class="!w-[180px]"
+            clearable
+            placeholder="请选码流类型"
+            @change="onSearch(form)"
+            @clear="onSearch(form)"
+          >
+            <el-option
+              v-for="(item, index) in streamTypes"
+              :key="index"
+              :label="item"
+              :value="index"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button

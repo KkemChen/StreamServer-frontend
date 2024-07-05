@@ -101,7 +101,9 @@ export function useUser(tableRef: Ref) {
     //搜索条件
     id: "",
     ip: "",
-    name: ""
+    name: "",
+    vendor: "",
+    streamType: ""
   });
 
   const streamInfo = reactive<{ list: any[] }>({
@@ -497,7 +499,9 @@ export function useUser(tableRef: Ref) {
       info =>
         matchesCriteria(info.id, form.id) &&
         matchesCriteria(info.ip, form.ip) &&
-        matchesCriteria(info.name, form.name)
+        matchesCriteria(info.name, form.name) &&
+        matchesCriteria(info.vendor?.toString(), form.vendor) &&
+        matchesCriteria(info.streamType?.toString(), form.streamType)
     );
     streamInfo.list = filteredList;
     pagination.total = filteredList.length;
@@ -972,6 +976,9 @@ export function useUser(tableRef: Ref) {
       let item = streamInfoCache.list.find(element => element.id === data.id);
       if (item) {
         item.runtime = data.runtime;
+        item.playerCount = `${(item?.runtime ?? []).reduce((total, item) => {
+          return total + (item?.playerCount ?? 0);
+        }, 0)}`;
       }
     };
   }
@@ -989,7 +996,9 @@ export function useUser(tableRef: Ref) {
     }
   });
   return {
+    vendorImages,
     form,
+    streamTypes,
     detailVisible,
     detailInfo,
     loading,

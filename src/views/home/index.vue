@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <!-- 第一行 -->
-    <div class="fullWidth xgrid4 spacingBottom">
+    <div class="fullWidth xgrid5 spacingBottom">
       <div class="contentBlock color">
         <div class="blockTitle">系统信息</div>
         <div :title="data.host.hostname" class="blockValue">
@@ -16,12 +16,28 @@
         <div :title="data.host.platform" class="blockValue">
           系统类型：{{ data.host.platform }}
         </div>
+        <div :title="data.host.uptime" class="blockValue">
+          系统运行时间：{{ runtime }}
+        </div>
         <div :title="data.host.systime" class="blockValue">
           系统时间：{{ data.host.systime }}
         </div>
       </div>
       <div class="contentBlock color stretch yflex">
-        <div class="blockTitle">CPU占用率</div>
+        <div class="blockTitle xflex aic jcsb">
+          CPU占用率
+          <el-tooltip effect="dark" placement="bottom">
+            <template #content>
+              <div>型号：{{ data.cpu["Model name"] }}</div>
+              <div>核心数量:{{ data.cpu["CPU(s)"] }}</div>
+              <div>主频 :{{ data.cpu["CPU MHz"] }}Mhz</div>
+              <div>最大睿频:{{ data.cpu["CPU max MHz"] }}Mhz</div>
+            </template>
+            <el-icon>
+              <Warning />
+            </el-icon>
+          </el-tooltip>
+        </div>
         <GaugeChart
           id="cpu"
           :color="color"
@@ -31,7 +47,20 @@
         />
       </div>
       <div class="contentBlock color stretch yflex">
-        <div class="blockTitle">内存占用率</div>
+        <div class="blockTitle xflex aic jcsb">
+          内存占用率
+          <el-tooltip effect="dark" placement="bottom">
+            <template #content>
+              <div>总容量：{{ convertUnit(data.mem.total, "kb") }}</div>
+              <div>已使用：{{ convertUnit(data.mem.used, "kb") }}</div>
+              <div>未使用：{{ convertUnit(data.mem.free, "kb") }}</div>
+              <div>缓存 ：{{ convertUnit(data.mem.cache, "kb") }}</div>
+            </template>
+            <el-icon>
+              <Warning />
+            </el-icon>
+          </el-tooltip>
+        </div>
         <GaugeChart
           id="mem"
           :color="color"
@@ -49,6 +78,12 @@
           :fontSize="fontSize"
           class="GaugeChart stretch"
         />
+      </div>
+      <div class="contentBlock color stretch yflex aic jcc">
+        <div class="blockTitle tac fontGreen">{{ liveCount }}</div>
+        <div class="blockTitle tac spacingBottom">转发总路数</div>
+        <div class="blockTitle tac fontGreen">{{ playerCount }}</div>
+        <div class="blockTitle tac">观看总人数</div>
       </div>
     </div>
     <!-- 第二行 -->
@@ -145,23 +180,57 @@
 
 <script setup>
 import { useDark } from "@pureadmin/utils";
-import { dashboardInfo, dashboardData } from "@/api/sysinfo";
+import {
+  dashboardInfo,
+  dashboardData,
+  streamLiveCount,
+  streamPlayerCount
+} from "@/api/sysinfo";
 import GaugeChart from "./components/GaugeChart.vue";
 import LineChart from "./components/LineChart.vue";
 import NetChart from "./components/NetChart.vue";
 import PieChart from "./components/PieChart.vue";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration);
 import { message } from "@/utils/message";
 import { ref, onMounted, reactive, onUnmounted, computed } from "vue";
+import { Warning } from "@element-plus/icons-vue";
 
 const { isDark } = useDark();
+//定时器id
+let timerId = undefined;
+let refreshId = undefined;
 const loading = ref(false);
+//观看人数
+const liveCount = ref(0);
+//摄像头总路数
+const playerCount = ref(0);
+// CPU占用率
+const cpuRate = ref(0);
+//内存占用率
+const memRate = ref(0);
+// 虚拟内存占用
+const swapRate = ref(0);
+// tab选中网卡
+const curNet = ref("");
+// 当前选中的硬盘
+const curDisk = ref("");
 //数据
 const data = reactive({
+  cpu: {},
   host: {},
   swap: {},
   disk: [],
   load: {},
-  net: []
+  net: [],
+  mem: {}
+});
+//系统运行时长
+const runtime = computed(() => {
+  let dur = data.host.uptime ?? 0;
+  return dayjs.duration(dur * 1000).format("Y年M月D天 H:m:s");
 });
 // 颜色配置
 const color = computed(() => {
@@ -185,39 +254,39 @@ const fontSize = reactive({
   bodySize: 20,
   descSize: 15
 });
-// CPU占用率
-const cpuRate = ref(0);
-//内存占用率
-const memRate = ref(0);
-// 虚拟内存占用
-const swapRate = ref(0);
 // 负载
 const lineX = reactive([]);
-// tab选中网卡
-const curNet = ref("");
 //根据当前tab返回列表中的数据
 const curNetData = computed(() => {
   let obj = data.net.find(v => v.interface_name === curNet.value);
   let rx = [];
   let tx = [];
+  // 网卡速率speed,Mbps
   if (obj) {
-    rx = obj.rx.map(v => Number.parseFloat((v / 1024).toFixed(2)));
-    tx = obj.tx.map(v => Number.parseFloat((v / 1024).toFixed(2)));
+    //如果有选中的
+    let speed = (obj.speed / 8) * 1024 * 1024;
+    //分母为0的已经过滤掉了，可以放心除
+    rx = obj.rx.map(v => Number.parseFloat(((v / speed) * 100).toFixed(2)));
+    tx = obj.tx.map(v => Number.parseFloat(((v / speed) * 100).toFixed(2)));
   } else {
+    //如果没有就看全部
     lineX.forEach((v, i) => {
       let total = data.net.reduce(
         (total, item) => {
           total.rx = total.rx + (item.rx[i] || 0);
           total.tx = total.tx + (item.tx[i] || 0);
+          total.speeds = total.speeds + item.speed;
           return total;
         },
         {
           rx: 0,
-          tx: 0
+          tx: 0,
+          speeds: 0
         }
       );
-      rx.push(Number.parseFloat((total.rx / 1024).toFixed(2)));
-      tx.push(Number.parseFloat((total.tx / 1024).toFixed(2)));
+      let speed = (total.speeds / 8) * 1024 * 1024;
+      rx[i] = Number.parseFloat(((total.rx / speed) * 100).toFixed(2));
+      tx[i] = Number.parseFloat(((total.tx / speed) * 100).toFixed(2));
     });
   }
   return {
@@ -225,8 +294,6 @@ const curNetData = computed(() => {
     tx
   };
 });
-// 当前选中的硬盘
-const curDisk = ref("");
 const curDiskData = computed(() => {
   let obj = data.disk.find(v => v.mounted_on === curDisk.value);
   // 有obj则为选中
@@ -250,20 +317,11 @@ const curDiskData = computed(() => {
     };
   }
 });
-//定时器id
-let timerId = undefined;
-let refreshId = undefined;
+//timeout递归定时，不建议用interval
 const loopGetData = async () => {
   await loadDashboardData();
-  if (!refreshId) {
-    // 一个小时刷新一次这个页面，数据堆积可能会卡死
-    refreshId = setTimeout(
-      () => {
-        window.location.reload();
-      },
-      60 * 60 * 1000
-    );
-  }
+  await loadStreamLiveCount();
+  await loadStreamPlayerCount();
   if (timerId) {
     clearTimeout(timerId);
     timerId = undefined;
@@ -302,13 +360,18 @@ const loadDashboardInfo = async () => {
   try {
     let res = await dashboardInfo();
     if (res.code === 0) {
-      data.net = (res.data.net ?? []).map(v => ({
-        ...v,
-        // 下行
-        rx: [],
-        // 上行
-        tx: []
-      }));
+      data.cpu = res.data.cpu ?? {};
+      data.net = (res.data.net ?? [])
+        .filter(v => !!v.speed)
+        .map(v => ({
+          ...v,
+          // 网卡速率
+          speed: Number(v.speed || "0"),
+          // 下行
+          rx: [],
+          // 上行
+          tx: []
+        }));
     } else {
       message(res.msg);
     }
@@ -320,6 +383,8 @@ const loadDashboardData = async () => {
   try {
     let res = await dashboardData();
     if (res.code === 0) {
+      //内存 数据
+      data.mem = res.data?.mem ?? {};
       // cpu占用率
       cpuRate.value = Number.parseFloat(
         (100 - (res.data.cpu?.idle ?? 0)).toFixed(2)
@@ -381,6 +446,31 @@ const loadDashboardData = async () => {
     throw err;
   }
 };
+const loadStreamLiveCount = async () => {
+  try {
+    let res = await streamLiveCount();
+    if (res.code === 0) {
+      liveCount.value = res.data.liveCount;
+    } else {
+      message(res.msg);
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+const loadStreamPlayerCount = async () => {
+  try {
+    let res = await streamPlayerCount();
+    if (res.code === 0) {
+      playerCount.value = res.data.playerCount;
+    } else {
+      message(res.msg);
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+//tab选中
 const setCurNet = name => {
   if (curNet.value === name) {
     curNet.value = "";
@@ -400,6 +490,13 @@ onMounted(async () => {
   await loadDashboardInfo();
   await loopGetData();
   loading.value = false;
+  // 一个小时刷新一次这个页面，数据堆积可能会卡死
+  refreshId = setTimeout(
+    () => {
+      window.location.reload();
+    },
+    60 * 60 * 1000
+  );
 });
 
 onUnmounted(() => {
@@ -413,6 +510,7 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 $backColor: var(--el-bg-color);
 $frontColor: var(--el-text-color-primary);
+$greenColor: #67c23a;
 $spacing: 10px;
 $radius: 3px;
 $titleSize: 25px;
@@ -450,6 +548,12 @@ $heightRate: 9px;
     column-gap: $spacing;
   }
 
+  .xgrid5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    column-gap: $spacing;
+  }
+
   .xflex {
     display: flex;
     flex-direction: row;
@@ -460,6 +564,22 @@ $heightRate: 9px;
   .yflex {
     display: flex;
     flex-direction: column;
+  }
+
+  .aic {
+    align-items: center;
+  }
+
+  .jcsb {
+    justify-content: space-between;
+  }
+
+  .jcc {
+    justify-content: center;
+  }
+
+  .tac {
+    text-align: center;
   }
 
   .tableHeader {
@@ -544,9 +664,13 @@ $heightRate: 9px;
   }
 
   .GaugeChart {
-    $rate: 20;
+    $rate: 25;
     min-width: $widthRate * $rate;
     min-height: $heightRate * $rate;
+  }
+
+  .fontGreen {
+    color: $greenColor;
   }
 
   #load {
