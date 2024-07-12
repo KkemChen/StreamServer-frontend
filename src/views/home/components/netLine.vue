@@ -174,7 +174,7 @@ onUnmounted(() => {
 .netLine {
   flex-grow: 1;
   align-self: stretch;
-  min-width: 200px;
-  min-height: 300px;
+  min-width: 700px;
+  min-height: 200px;
 }
 </style>

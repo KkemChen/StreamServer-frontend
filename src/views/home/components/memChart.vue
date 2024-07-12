@@ -120,7 +120,9 @@ onUnmounted(() => {
 </script>
 <style lang="scss" scoped>
 .memChart {
-  min-width: 120px;
-  min-height: 350px;
+  flex-grow: 1;
+  align-self: stretch;
+  min-width: 300px;
+  min-height: 300px;
 }
 </style>

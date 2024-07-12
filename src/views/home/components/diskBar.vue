@@ -51,10 +51,11 @@ setOptions({
     {
       name: "硬盘使用情况",
       type: "pie",
-      radius: "70%",
+      radius: "65%",
       avoidLabelOverlap: false,
       label: {
-        show: true
+        show: true,
+        alignTo: "edge"
         // position: "inside"
       },
       labelLine: {
@@ -76,7 +77,7 @@ onUnmounted(() => {
 .diskBar {
   flex-grow: 1;
   align-self: stretch;
-  min-width: 50px;
-  min-height: 350px;
+  min-width: 300px;
+  min-height: 300px;
 }
 </style>

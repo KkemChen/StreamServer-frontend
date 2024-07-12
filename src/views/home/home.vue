@@ -1,54 +1,56 @@
 <template>
-  <div class="pageRoot">
+  <div class="pageRoot allPadding">
     <!--  基础文字信息-->
     <div class="row xFlex label">
-      <div class="info mr stretch yFlex jcc aic">
+      <div class="info allPadding mr stretch yFlex jcc aic">
         系统运行时间：{{ runtime }}
       </div>
-      <div class="info mr xFlex stretch jcc aic">
+      <div class="info allPadding mr xFlex stretch jcc aic">
         <div class="mr">CPU：</div>
         <div class="xFlex">
-          <div class="item overlay">{{ data.cpu["CPU(s)"] }}&nbsp;核</div>
-          <div class="item overlay ml">{{ threads }}&nbsp;线程</div>
+          <div class="item overlay allPadding">
+            {{ data.cpu["CPU(s)"] }}&nbsp;核
+          </div>
+          <div class="item overlay ml allPadding">{{ threads }}&nbsp;线程</div>
         </div>
       </div>
-      <div class="info mr xFlex jcc aic">
+      <div class="info allPadding mr xFlex jcc aic">
         <div class="mr">内存：</div>
         <div class="xFlex">
-          <div class="item overlay xFlex aic">
+          <div class="item allPadding overlay xFlex aic">
             <span>总容量：</span>
             <span>{{ convertUnit(data.mem.total, "kb") }}</span>
           </div>
-          <div class="item overlay xFlex aic ml">
+          <div class="item allPadding overlay xFlex aic ml">
             <span>已使用：</span>
             <span>{{ convertUnit(data.mem.used, "kb") }}</span>
           </div>
-          <div class="item overlay xFlex aic ml">
+          <div class="item allPadding overlay xFlex aic ml">
             <span>未使用：</span>
             <span>{{ convertUnit(data.mem.free, "kb") }}</span>
           </div>
         </div>
       </div>
-      <div class="info xFlex jcc aic stretch flexRight">
-        <div class="item xFlex aic">
+      <div class="info allPadding xFlex jcc aic stretch flexRight">
+        <div class="item allPadding xFlex aic">
           <span>转发总路数：</span>
           <span>{{ liveCount }}</span>
         </div>
-        <div class="item xFlex aic ml">
+        <div class="item allPadding xFlex aic ml">
           <span>观看总人数：</span>
           <span>{{ playerCount }}</span>
         </div>
       </div>
     </div>
     <div class="row grid3 mt">
-      <div class="info stretch yFlex">
+      <div class="info allPadding stretch yFlex">
         <div class="xFlex jcsb aic stretch">
           <span class="label">{{ data.cpu["Model name"] }}</span>
           <el-tag :type="tagColor" class="value" round>{{ cpuRate }}%</el-tag>
         </div>
         <cpuLine :value="cpuRateList" :x="lineX" class="stretch amplify" />
       </div>
-      <div class="info stretch yFlex">
+      <div class="info allPadding stretch yFlex">
         <div class="xFlex jcsb aic fullWidth">
           <span class="label">硬盘</span>
           <span class="label"
@@ -57,11 +59,9 @@
             }}</span
           >
         </div>
-        <div class="amplify stretch grid2">
-          <diskBar :value="data.disk" />
-        </div>
+        <diskBar :value="data.disk" />
       </div>
-      <div class="info stretch yFlex">
+      <div class="info allPadding stretch yFlex">
         <div class="xFlex jcsb aic stretch">
           <span class="label">内存</span>
           <el-tag round size="large" type="success"
@@ -71,7 +71,7 @@
         <memChart :value="memList" :x="lineX" class="stretch" />
       </div>
     </div>
-    <div class="row amplify info mt yFlex">
+    <div class="row amplify info allPadding mt yFlex">
       <div class="xFlex aic stretch">
         <el-tag round size="large" type="primary"
           >上传速度：{{ convertUnit(netTotalData.nowTx, "mb") }}/s
@@ -452,12 +452,23 @@ onUnmounted(() => {
 //--el-bg-color-overlay
 
 //间距圆角
-$spacing: 7px;
+//标准间距
+$spacing: 10px;
+$spacing2: 5px;
+$spacing3: 3px;
 $radius: 5px;
-//字体大小
-$titleSize: 20px;
-$bodySize: 16px;
-$descSize: 12px;
+//字体大小，第一档最大
+$titleSize: 25px;
+$bodySize: 20px;
+$descSize: 15px;
+//第二档
+$titleSize2: 20px;
+$bodySize2: 16px;
+$descSize2: 12px;
+//第三档
+$titleSize3: 15px;
+$bodySize3: 13px;
+$descSize3: 12px;
 
 //布局类
 .grid3 {
@@ -568,12 +579,11 @@ $descSize: 12px;
   margin: 0 !important;
   width: 100%;
   height: 100%;
-  box-sizing: border-box;
-  padding: $spacing;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: flex-start;
+  min-width: 1024px;
 
   * {
     word-break: break-all;
@@ -588,36 +598,172 @@ $descSize: 12px;
 .info {
   border-radius: $radius;
   background-color: var(--el-bg-color-overlay);
-  padding: $spacing;
 
   .overlay {
     background-color: var(--el-bg-color);
   }
 
   .item {
-    padding: $spacing;
     border-radius: $radius;
   }
+}
 
-  .noPd {
-    padding: 0;
+@media screen and (max-width: 1366px) {
+  .grid3 {
+    column-gap: $spacing3;
+  }
+  //间距类
+  .mr {
+    margin-right: $spacing3;
+  }
+
+  .mb {
+    margin-bottom: $spacing3;
+  }
+
+  .mt {
+    margin-top: $spacing3;
+  }
+
+  .ml {
+    margin-left: $spacing3;
+  }
+
+  .allMargin {
+    margin: $spacing3;
+  }
+
+  .xMargin {
+    margin-left: $spacing3;
+    margin-right: $spacing3;
+  }
+
+  .yMargin {
+    margin-top: $spacing3;
+    margin-bottom: $spacing3;
+  }
+
+  .allPadding {
+    padding: $spacing3;
+  }
+
+  //字体大小
+  .label {
+    font-size: $titleSize3;
+  }
+
+  .value {
+    font-size: $bodySize3;
+  }
+
+  .desc {
+    font-size: $descSize3;
   }
 }
 
-.round {
-  padding: $spacing;
-  width: 200px;
-  height: 200px;
-  //border: 1px solid var(--el-border-color);
-  border-radius: $radius;
-  background-color: var(--el-bg-color-overlay);
+@media screen and (min-width: 1366px) and (max-width: 1920px) {
+  .grid3 {
+    column-gap: $spacing2;
+  }
+  //间距类
+  .mr {
+    margin-right: $spacing2;
+  }
+
+  .mb {
+    margin-bottom: $spacing2;
+  }
+
+  .mt {
+    margin-top: $spacing2;
+  }
+
+  .ml {
+    margin-left: $spacing2;
+  }
+
+  .allMargin {
+    margin: $spacing2;
+  }
+
+  .xMargin {
+    margin-left: $spacing2;
+    margin-right: $spacing2;
+  }
+
+  .yMargin {
+    margin-top: $spacing2;
+    margin-bottom: $spacing2;
+  }
+
+  .allPadding {
+    padding: $spacing2;
+  }
+
+  //字体大小
+  .label {
+    font-size: $titleSize2;
+  }
+
+  .value {
+    font-size: $bodySize2;
+  }
+
+  .desc {
+    font-size: $descSize2;
+  }
 }
 
-.rectangle {
-  padding: $spacing;
-  width: 150px;
-  //border: 1px solid var(--el-border-color);
-  border-radius: $radius;
-  background-color: var(--el-bg-color-overlay);
+@media screen and (min-width: 1920px) {
+  .grid3 {
+    column-gap: $spacing;
+  }
+  //间距类
+  .mr {
+    margin-right: $spacing;
+  }
+
+  .mb {
+    margin-bottom: $spacing;
+  }
+
+  .mt {
+    margin-top: $spacing;
+  }
+
+  .ml {
+    margin-left: $spacing;
+  }
+
+  .allMargin {
+    margin: $spacing;
+  }
+
+  .xMargin {
+    margin-left: $spacing;
+    margin-right: $spacing;
+  }
+
+  .yMargin {
+    margin-top: $spacing;
+    margin-bottom: $spacing;
+  }
+
+  .allPadding {
+    padding: $spacing;
+  }
+
+  //字体大小
+  .label {
+    font-size: $titleSize;
+  }
+
+  .value {
+    font-size: $bodySize;
+  }
+
+  .desc {
+    font-size: $descSize;
+  }
 }
 </style>
