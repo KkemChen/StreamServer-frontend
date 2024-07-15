@@ -2,7 +2,7 @@
   <div ref="diskBar" class="diskBar" />
 </template>
 <script setup>
-import { ref, computed, onUnmounted, defineProps, watch, onMounted } from "vue";
+import { ref, computed, onUnmounted, defineProps, watch } from "vue";
 import { useDark, useECharts } from "@pureadmin/utils";
 
 const { isDark } = useDark();
@@ -11,7 +11,7 @@ let theme = computed(() => {
   return isDark.value ? "dark" : "default";
 });
 
-const { getInstance, setOptions } = useECharts(diskBar, { theme });
+const { getInstance, setOptions, resize } = useECharts(diskBar, { theme });
 const props = defineProps({
   value: {
     type: Array,
@@ -21,16 +21,30 @@ const props = defineProps({
 const KBToGB = (value = 0) => {
   return Number.parseFloat((value / 1024 / 1024).toFixed(2));
 };
+const ChartData = computed(() => {
+  let seriesName = [];
+  let used = [];
+  let available = [];
+  props.value.forEach(v => {
+    seriesName.push(v.mounted_on);
+    used.push(v.used);
+    available.push(v.available);
+  });
+  return { seriesName, used, available };
+});
 let watchId = watch(
   () => props.value,
   (n, o) => {
     getInstance()?.setOption({
+      yAxis: {
+        data: ChartData.value.seriesName
+      },
       series: [
         {
-          data: n.map(v => ({
-            name: v.mounted_on,
-            value: Number.parseFloat(v.size)
-          }))
+          data: ChartData.value.used
+        },
+        {
+          data: ChartData.value.available
         }
       ]
     });
@@ -40,31 +54,44 @@ let watchId = watch(
   }
 );
 setOptions({
-  legend: {},
   tooltip: {
-    trigger: "item",
+    trigger: "axis",
+    axisPointer: {
+      type: "shadow"
+    },
     formatter: args => {
-      return `${args.seriesName}<br/>${args.marker}${args.name}\t${KBToGB(args.value)}GB(${args.percent}%)`;
+      return `${args[0].axisValueLabel}<br/>${args.map(v => `${v.marker} ${v.seriesName}：${KBToGB(v.value)}GB`).join("<br/>")}`;
     }
+  },
+  grid: {
+    left: "3%",
+    right: "5%",
+    bottom: "0%",
+    top: "5%",
+    containLabel: true
+  },
+  xAxis: {
+    type: "value",
+    axisLabel: {
+      formatter: v => {
+        return KBToGB(v) + "GB";
+      }
+    }
+  },
+  yAxis: {
+    type: "category",
+    data: ChartData.value.seriesName
   },
   series: [
     {
-      name: "硬盘使用情况",
-      type: "pie",
-      radius: "65%",
-      avoidLabelOverlap: false,
-      label: {
-        show: true,
-        alignTo: "edge"
-        // position: "inside"
-      },
-      labelLine: {
-        show: true
-      },
-      data: props.value.map(v => ({
-        name: v.mounted_on,
-        value: Number.parseFloat(v.size)
-      }))
+      name: "已使用",
+      type: "bar",
+      data: ChartData.value.used
+    },
+    {
+      name: "未使用",
+      type: "bar",
+      data: ChartData.value.available
     }
   ]
 });
