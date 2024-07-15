@@ -68,7 +68,12 @@
             >{{ convertUnit(data.mem.total, "kb") }}
           </el-tag>
         </div>
-        <memChart :value="memList" :x="lineX" class="stretch" />
+        <memChart
+          :source="data.mem"
+          :value="memList"
+          :x="lineX"
+          class="stretch"
+        />
       </div>
     </div>
     <div class="row amplify info allPadding mt yFlex">
@@ -161,7 +166,9 @@ const data = reactive({
   host: {},
   disk: [],
   net: [],
-  mem: {}
+  mem: {
+    total: 0
+  }
 });
 // 公用折线图X轴
 const lineX = reactive([]);

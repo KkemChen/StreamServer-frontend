@@ -12,6 +12,10 @@ let theme = computed(() => {
 });
 const { setOptions, getInstance } = useECharts(memChart, { theme });
 const props = defineProps({
+  source: {
+    type: Object,
+    default: () => ({})
+  },
   value: {
     type: Array,
     default: () => []
@@ -55,6 +59,7 @@ setOptions({
   yAxis: [
     {
       type: "value",
+      max: props.source.total,
       axisLabel: {
         formatter: v => {
           return KBToGB(v) + "GB";
@@ -78,6 +83,22 @@ setOptions({
   ]
 });
 let watchId = {
+  source: watch(
+    () => props.source,
+    (n, o) => {
+      console.log(n);
+      getInstance()?.setOption({
+        yAxis: [
+          {
+            max: n.total
+          }
+        ]
+      });
+    },
+    {
+      deep: true
+    }
+  ),
   x: watch(
     props.x,
     (n, o) => {
@@ -116,6 +137,7 @@ onUnmounted(() => {
   // 销毁监听器
   watchId.value();
   watchId.x();
+  watchId.source();
 });
 </script>
 <style lang="scss" scoped>
