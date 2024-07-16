@@ -301,8 +301,8 @@ const dataByShowMode = computed(() => {
 const netTotalData = computed(() => {
   let nowRx = netNumberData.value.rx.at(-1) ?? 0,
     nowTx = netNumberData.value.tx.at(-1) ?? 0,
-    rxs = netNumberData.value.rx.reduce((total, item) => total + item, 0) * 8,
-    txs = netNumberData.value.tx.reduce((total, item) => total + item, 0) * 8;
+    rxs = netNumberData.value.rx.reduce((total, item) => total + item, 0) / 8,
+    txs = netNumberData.value.tx.reduce((total, item) => total + item, 0) / 8;
   return {
     nowRx,
     nowTx,
