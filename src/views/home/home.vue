@@ -9,9 +9,11 @@
         <div class="mr">CPU：</div>
         <div class="xFlex">
           <div class="item overlay allPadding">
-            {{ data.cpu["CPU(s)"] }}&nbsp;核
+            {{ data.cpu["Core(s) per socket"] }}核
           </div>
-          <div class="item overlay ml allPadding">{{ threads }}&nbsp;线程</div>
+          <div class="item overlay ml allPadding">
+            {{ data.cpu["CPU(s)"] }}线程
+          </div>
         </div>
       </div>
       <div class="info allPadding mr xFlex jcc aic">
@@ -50,7 +52,7 @@
           }}</span>
           <el-tag :type="tagColor" class="value" round>{{ cpuRate }}%</el-tag>
         </div>
-        <cpuLine :value="cpuRateList" :x="lineX" class="stretch amplify" />
+        <cpuLine :value="cpuRateList" :x="lineX" />
       </div>
       <div class="info allPadding stretch yFlex">
         <div class="xFlex jcsb aic fullWidth">
@@ -70,12 +72,7 @@
             >{{ convertUnit(data.mem.total, "kb") }}
           </el-tag>
         </div>
-        <memChart
-          :source="data.mem"
-          :value="memList"
-          :x="lineX"
-          class="stretch"
-        />
+        <memChart :source="data.mem" :value="memList" :x="lineX" />
       </div>
     </div>
     <div class="row amplify info allPadding mt yFlex">
@@ -193,7 +190,7 @@ const runtime = computed(() => {
 //线程数
 const threads = computed(() => {
   return (
-    Number.parseInt(data.cpu["CPU(s)"]) *
+    Number.parseInt(data.cpu["Core(s) per socket"]) *
     Number.parseInt(data.cpu["Thread(s) per core"])
   );
 });
@@ -299,8 +296,8 @@ const dataByShowMode = computed(() => {
 const netTotalData = computed(() => {
   let nowRx = netNumberData.value.rx.at(-1) ?? 0,
     nowTx = netNumberData.value.tx.at(-1) ?? 0,
-    rxs = netNumberData.value.rx.reduce((total, item) => total + item, 0),
-    txs = netNumberData.value.tx.reduce((total, item) => total + item, 0);
+    rxs = netNumberData.value.rx.reduce((total, item) => total + item, 0) * 8,
+    txs = netNumberData.value.tx.reduce((total, item) => total + item, 0) * 8;
   return {
     nowRx,
     nowTx,
@@ -484,6 +481,7 @@ $descSize3: 12px;
   display: grid;
   column-gap: $spacing;
   grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 400px;
 }
 
 .xFlex {

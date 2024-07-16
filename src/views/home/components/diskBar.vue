@@ -66,7 +66,7 @@ setOptions({
   grid: {
     left: "3%",
     right: "5%",
-    bottom: "0%",
+    bottom: "1%",
     top: "5%",
     containLabel: true
   },
