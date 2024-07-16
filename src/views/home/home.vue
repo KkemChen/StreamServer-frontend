@@ -398,9 +398,9 @@ const loadDashboardData = async () => {
       //磁盘信息
       data.disk = res.data?.disk ?? [];
       //共享x轴放最后便于监听
-      if (res.data.host?.systime) {
-        lineX.push(res.data.host.systime);
-      }
+      lineX.push(
+        res.data.host?.systime ?? dayjs().format("YYYY-MM-DD HH:mm:ss")
+      );
     } else {
       message(res.msg);
     }
