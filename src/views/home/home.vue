@@ -45,16 +45,16 @@
       </div>
     </div>
     <div class="row grid3 mt">
-      <div class="info allPadding stretch yFlex">
-        <div class="xFlex jcsb aic stretch">
+      <div class="info allPadding">
+        <div class="xFlex jcsb aic fullWidth">
           <span :title="data.cpu['Model name']" class="label labelNoWrap">{{
             data.cpu["Model name"]
           }}</span>
           <el-tag :type="tagColor" class="value" round>{{ cpuRate }}%</el-tag>
         </div>
-        <cpuLine :value="cpuRateList" :x="lineX" />
+        <cpuLine :value="cpuRateList" :x="lineX" class="chart" />
       </div>
-      <div class="info allPadding stretch yFlex">
+      <div class="info allPadding stretch">
         <div class="xFlex jcsb aic fullWidth">
           <span class="label">硬盘</span>
           <span class="label"
@@ -63,16 +63,21 @@
             }}</span
           >
         </div>
-        <diskBar :value="data.disk" />
+        <diskBar :value="data.disk" class="chart" />
       </div>
-      <div class="info allPadding stretch yFlex">
-        <div class="xFlex jcsb aic stretch">
+      <div class="info allPadding stretch">
+        <div class="xFlex jcsb aic fullWidth">
           <span class="label">内存</span>
           <el-tag round size="large" type="success"
             >{{ convertUnit(data.mem.total, "kb") }}
           </el-tag>
         </div>
-        <memChart :source="data.mem" :value="memList" :x="lineX" />
+        <memChart
+          :source="data.mem"
+          :value="memList"
+          :x="lineX"
+          class="chart"
+        />
       </div>
     </div>
     <div class="row amplify info allPadding mt yFlex">
@@ -384,10 +389,8 @@ const loadDashboardData = async () => {
         let obj = (res.data.net ?? []).find(
           item => item.interface_name === v.interface_name
         );
-        if (obj) {
-          v.rx.push(obj.rx_speed);
-          v.tx.push(obj.tx_speed);
-        }
+        v.rx.push(obj.rx_speed ?? 0);
+        v.tx.push(obj.tx_speed ?? 0);
       });
       // 主机信息
       data.host = res.data.host ?? {};
@@ -481,7 +484,6 @@ $descSize3: 12px;
   display: grid;
   column-gap: $spacing;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 400px;
 }
 
 .xFlex {
@@ -585,6 +587,11 @@ $descSize3: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.chart {
+  width: 100%;
+  height: 250px;
 }
 
 //实例样式

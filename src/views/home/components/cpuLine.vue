@@ -1,5 +1,5 @@
 <template>
-  <div ref="cpuLine" class="cpuLine" />
+  <div ref="cpuLine" />
 </template>
 <script setup>
 import { ref, computed, onUnmounted, defineProps, watch, onMounted } from "vue";
@@ -118,11 +118,3 @@ onUnmounted(() => {
   watchId.value();
 });
 </script>
-<style lang="scss" scoped>
-.cpuLine {
-  flex-grow: 1;
-  align-self: stretch;
-  min-width: 300px;
-  min-height: 300px;
-}
-</style>

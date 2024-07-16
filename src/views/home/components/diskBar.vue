@@ -1,5 +1,5 @@
 <template>
-  <div ref="diskBar" class="diskBar" />
+  <div ref="diskBar" />
 </template>
 <script setup>
 import { ref, computed, onUnmounted, defineProps, watch } from "vue";
@@ -105,11 +105,3 @@ onUnmounted(() => {
   watchId();
 });
 </script>
-<style lang="scss" scoped>
-.diskBar {
-  flex-grow: 1;
-  align-self: stretch;
-  min-width: 300px;
-  min-height: 300px;
-}
-</style>

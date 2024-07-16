@@ -1,5 +1,5 @@
 <template>
-  <div ref="memChart" class="memChart" />
+  <div ref="memChart" />
 </template>
 <script setup>
 import { ref, reactive, computed, onUnmounted, defineProps, watch } from "vue";
@@ -139,11 +139,3 @@ onUnmounted(() => {
   watchId.source();
 });
 </script>
-<style lang="scss" scoped>
-.memChart {
-  flex-grow: 1;
-  align-self: stretch;
-  min-width: 300px;
-  min-height: 300px;
-}
-</style>
