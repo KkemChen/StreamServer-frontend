@@ -980,7 +980,7 @@ export function useUser(tableRef: Ref) {
         item.playerCount = `${(item?.runtime ?? []).reduce((total, item) => {
           return total + (item?.playerCount ?? 0);
         }, 0)}`;
-        onSearch(form);
+        streamInfo.list = streamInfoCache.list;
       }
     };
   }
