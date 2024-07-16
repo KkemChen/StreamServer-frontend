@@ -974,11 +974,13 @@ export function useUser(tableRef: Ref) {
     ws.onmessage = event => {
       const data = JSON.parse(event.data).data;
       let item = streamInfoCache.list.find(element => element.id === data.id);
+
       if (item) {
         item.runtime = data.runtime;
         item.playerCount = `${(item?.runtime ?? []).reduce((total, item) => {
           return total + (item?.playerCount ?? 0);
         }, 0)}`;
+        onSearch(form);
       }
     };
   }

@@ -86,7 +86,6 @@ let watchId = {
   source: watch(
     () => props.source,
     (n, o) => {
-      console.log(n);
       getInstance()?.setOption({
         yAxis: [
           {

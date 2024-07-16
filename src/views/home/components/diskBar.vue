@@ -80,6 +80,11 @@ setOptions({
   },
   yAxis: {
     type: "category",
+    axisLabel: {
+      width: 70,
+      showMaxLabel: true,
+      overflow: "truncate"
+    },
     data: ChartData.value.seriesName
   },
   series: [

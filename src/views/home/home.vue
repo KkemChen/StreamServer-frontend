@@ -45,7 +45,9 @@
     <div class="row grid3 mt">
       <div class="info allPadding stretch yFlex">
         <div class="xFlex jcsb aic stretch">
-          <span class="label">{{ data.cpu["Model name"] }}</span>
+          <span :title="data.cpu['Model name']" class="label labelNoWrap">{{
+            data.cpu["Model name"]
+          }}</span>
           <el-tag :type="tagColor" class="value" round>{{ cpuRate }}%</el-tag>
         </div>
         <cpuLine :value="cpuRateList" :x="lineX" class="stretch amplify" />
@@ -79,10 +81,10 @@
     <div class="row amplify info allPadding mt yFlex">
       <div class="xFlex aic stretch">
         <el-tag round size="large" type="primary"
-          >上传速度：{{ convertUnit(netTotalData.nowTx, "mb") }}/s
+          >上传速度：{{ netTotalData.nowTx }}Mbit/s
         </el-tag>
         <el-tag class="ml" round size="large" type="primary"
-          >下载速度：{{ convertUnit(netTotalData.nowRx, "mb") }}/s
+          >下载速度：{{ netTotalData.nowRx }}Mbit/s
         </el-tag>
         <el-tag class="xMargin" round size="large" type="primary"
           >总上传：{{ convertUnit(netTotalData.txs, "mb") }}
@@ -218,10 +220,10 @@ const netNumberData = computed(() => {
   if (obj) {
     //如果有选中的
     rx = obj.rx.map(v => {
-      return Number.parseFloat((v / 1024 / 1024).toFixed(2));
+      return Number.parseFloat(((v / 1024 / 1024) * 8).toFixed(2));
     });
     tx = obj.tx.map(v => {
-      return Number.parseFloat((v / 1024 / 1024).toFixed(2));
+      return Number.parseFloat(((v / 1024 / 1024) * 8).toFixed(2));
     });
   } else {
     //如果没有就看全部
@@ -237,8 +239,8 @@ const netNumberData = computed(() => {
           tx: 0
         }
       );
-      total.rx = Number.parseFloat((total.rx / 1024 / 1024).toFixed(2));
-      total.tx = Number.parseFloat((total.rx / 1024 / 1024).toFixed(2));
+      total.rx = Number.parseFloat(((total.rx / 1024 / 1024) * 8).toFixed(2));
+      total.tx = Number.parseFloat(((total.tx / 1024 / 1024) * 8).toFixed(2));
       rx[i] = total.rx;
       tx[i] = total.tx;
     });
@@ -578,6 +580,13 @@ $descSize3: 12px;
 
 .desc {
   font-size: $descSize;
+}
+
+.labelNoWrap {
+  width: 85%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 //实例样式

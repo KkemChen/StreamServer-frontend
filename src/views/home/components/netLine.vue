@@ -2,7 +2,7 @@
   <div ref="netLine" class="netLine" />
 </template>
 <script setup>
-import { ref, reactive, computed, onUnmounted, defineProps, watch } from "vue";
+import { ref, computed, onUnmounted, defineProps, watch } from "vue";
 import { useDark, useECharts } from "@pureadmin/utils";
 
 const { isDark } = useDark();
@@ -38,7 +38,7 @@ setOptions({
     },
     formatter(args) {
       if (props.showMode === 1) {
-        return `${args[0].axisValueLabel}<br/>${args.map(v => `${v.marker} ${v.seriesName}：${v.data}MB`).join("<br/>")}`;
+        return `${args[0].axisValueLabel}<br/>${args.map(v => `${v.marker} ${v.seriesName}：${v.data}Mbit`).join("<br/>")}`;
       } else {
         return `${args[0].axisValueLabel}<br/>${args.map(v => `${v.marker} ${v.seriesName}：${v.data}%`).join("<br/>")}`;
       }
@@ -70,7 +70,7 @@ setOptions({
       axisLabel: {
         formatter: v => {
           if (props.showMode === 1) {
-            return `${v}MB`;
+            return `${v}Mbit`;
           } else {
             return `${v}%`;
           }
