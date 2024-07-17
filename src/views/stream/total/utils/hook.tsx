@@ -497,6 +497,7 @@ export function useUser(tableRef: Ref) {
     streamInfo.list = filteredList;
     pagination.total = filteredList.length;
     loading.value = false;
+    tableRef.value.getTableRef().clearSort();
   }
 
   const resetForm = formEl => {
