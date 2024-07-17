@@ -505,10 +505,11 @@ export function useUser(tableRef: Ref) {
     // form.deptId = "";
     // treeRef.value.onTreeReset();
     // fetchAll();
-    loading.value = true;
+    // loading.value = true;
     streamInfo.list = JSON.parse(JSON.stringify(streamInfoCache.list));
+    tableRef.value.getTableRef().clearSort();
     pagination.total = streamInfoCache.list.length;
-    loading.value = false;
+    // loading.value = false;
   };
   const sortChange = args => {
     let list;
