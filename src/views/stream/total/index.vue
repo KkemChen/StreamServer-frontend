@@ -48,6 +48,7 @@ const {
   // buttonClass,
   deviceDetection,
   fetchAll,
+  sortChange,
   onSearch,
   resetForm,
   onbatchDel,
@@ -73,24 +74,6 @@ const playDialogVisible = ref(false);
 const videoUrl = ref("");
 let dp = null;
 let flvPlayer = null;
-const sortChange = args => {
-  if (args.order === "ascending") {
-    // 升序
-    streamInfo.list = streamInfo.list.sort((a, b) => {
-      return a[args.prop]?.localeCompare(b[args.prop]);
-    });
-  } else if (args.order === "descending") {
-    //   降序
-    streamInfo.list = streamInfo.list.sort((a, b) => {
-      return b[args.prop]?.localeCompare(a[args.prop]);
-    });
-  } else {
-    //默认按照创建时间排序
-    streamInfo.list = streamInfo.list.sort((a, b) => {
-      return b.createTime?.localeCompare(a.createTime);
-    });
-  }
-};
 const setLiveDotColor = color => {
   if (color == "#b7daff") {
   }
@@ -212,12 +195,13 @@ const play = (id: String) => {
         :model="form"
         class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
       >
-        <el-form-item label="视频流名称" prop="cameraName">
+        <el-form-item label="视频流名称" prop="name">
           <el-input
             v-model="form.name"
             class="!w-[180px]"
             clearable
             placeholder="请输入视频流名称"
+            @clear="onSearch(form)"
             @keyup.enter="onSearch(form)"
           />
         </el-form-item>
@@ -227,6 +211,7 @@ const play = (id: String) => {
             class="!w-[180px]"
             clearable
             placeholder="请输入视频流ID"
+            @clear="onSearch(form)"
             @keyup.enter="onSearch(form)"
           />
         </el-form-item>
@@ -236,6 +221,7 @@ const play = (id: String) => {
             class="!w-[180px]"
             clearable
             placeholder="请输入IP地址"
+            @clear="onSearch(form)"
             @keyup.enter="onSearch(form)"
           />
         </el-form-item>

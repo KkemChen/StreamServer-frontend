@@ -33,7 +33,31 @@ import otherImage from "@/assets/vendor/other.png";
 import Tag from "primevue/tag";
 // import UserIcon from "@iconify-icons/ri/user-3-line";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import {
+  getKeyList,
+  isAllEmpty,
+  // hideTextAtIndex,
+  deviceDetection
+} from "@pureadmin/utils";
+import {
+  // getRoleIds,
+  // getDeptList,
+  getStreamInfo,
+  addStreamInfo,
+  delStreamInfo,
+  batchAddStreamInfo,
+  batchDelStreamInfo
+  // getAllRoleList
+} from "@/api/stream";
+import {
+  ElForm,
+  ElInput,
+  ElFormItem,
+  ElProgress
+  // ElMessageBox
+} from "element-plus";
 
+// import { retrieveColumnLayout } from "echarts/types/src/layout/barGrid.js";
 const vendorImages = {
   0: { image: otherImage, name: "其他" },
   1: { image: hikvisionImage, name: "海康" },
@@ -70,32 +94,6 @@ const detailInfo = reactive({
   updateTime: { label: "更新时间", value: "0000-00-00 00:00:00" }
 });
 
-import {
-  getKeyList,
-  isAllEmpty,
-  // hideTextAtIndex,
-  deviceDetection
-} from "@pureadmin/utils";
-import {
-  // getRoleIds,
-  // getDeptList,
-  getStreamInfo,
-  addStreamInfo,
-  delStreamInfo,
-  batchAddStreamInfo,
-  batchDelStreamInfo
-  // getAllRoleList
-} from "@/api/stream";
-import {
-  ElForm,
-  ElInput,
-  ElFormItem,
-  ElProgress
-  // ElMessageBox
-} from "element-plus";
-
-// import { retrieveColumnLayout } from "echarts/types/src/layout/barGrid.js";
-
 export function useUser(tableRef: Ref) {
   const form = reactive({
     //搜索条件
@@ -118,6 +116,7 @@ export function useUser(tableRef: Ref) {
 
   const formRef = ref();
   const ruleFormRef = ref();
+  //列表的分页数据
   const dataList = computed(() => {
     const startIndex = (pagination.currentPage - 1) * pagination.pageSize;
     // 计算当前页的结束索引
@@ -127,6 +126,7 @@ export function useUser(tableRef: Ref) {
   });
   const loading = ref(true);
   const uploadLoading = ref(false);
+  // 导出选择字段
   const exportFiledsDialog = ref(false);
   // 上传头像信息
   const avatarInfo = ref();
@@ -143,8 +143,9 @@ export function useUser(tableRef: Ref) {
     background: true,
     pageSizes: [10, 20, 50, 100, 500]
   });
-  let hideCol = localStorage.getItem("streamHideCol");
-  hideCol = JSON.parse(hideCol || "[]");
+  //需要隐藏的列
+  let hideCol = JSON.parse(localStorage.getItem("streamHideCol") || "[]");
+
   let columns: TableColumnList = [
     {
       label: "勾选列", // 如果需要表格多选，此处label必须设置
@@ -312,9 +313,12 @@ export function useUser(tableRef: Ref) {
   if (hideCol.length === 0) {
     hideCol = columns.filter(v => !v.hide).map(v => v.label);
   }
+  //需要导出的字段
   const exportFileds: any = ref(columns.filter(v => !v.noExport));
   //导出弹窗里的,有prop的都勾上
-  const checkedFileds: any = ref(exportFileds.value.map(v => v.prop));
+  const checkedFileds: any = ref(
+    exportFileds.value.map(v => v.prop).concat(["rtsp"])
+  );
   // disabled字段默认false
   exportFileds.value.push(
     {
@@ -343,7 +347,6 @@ export function useUser(tableRef: Ref) {
       disabled: true
     }
   );
-  checkedFileds.value.push("rtsp");
 
   columns = columns.map(v => {
     return {
@@ -466,21 +469,9 @@ export function useUser(tableRef: Ref) {
       .sort((a, b) => {
         return b.createTime?.localeCompare(a.createTime);
       });
-    streamInfo.list = data.list
-      .map(v => ({
-        ...v,
-        playerCount: `${(v?.runtime ?? []).reduce((total, item) => {
-          return total + (item?.playerCount ?? 0);
-        }, 0)}`
-      }))
-      .sort((a, b) => {
-        return b.createTime?.localeCompare(a.createTime);
-      });
+    streamInfo.list = JSON.parse(JSON.stringify(streamInfoCache.list));
     pagination.total = data.total;
     loading.value = false;
-    // setTimeout(() => {
-    //   loading.value = false;
-    // }, 500);
   }
 
   async function onSearch(form) {
@@ -503,7 +494,7 @@ export function useUser(tableRef: Ref) {
         matchesCriteria(info.vendor?.toString(), form.vendor) &&
         matchesCriteria(info.streamType?.toString(), form.streamType)
     );
-    streamInfo.list = filteredList;
+    streamInfo.list = JSON.parse(JSON.stringify(filteredList));
     pagination.total = filteredList.length;
     loading.value = false;
   }
@@ -515,9 +506,29 @@ export function useUser(tableRef: Ref) {
     // treeRef.value.onTreeReset();
     // fetchAll();
     loading.value = true;
-    streamInfo.list = streamInfoCache.list;
+    streamInfo.list = JSON.parse(JSON.stringify(streamInfoCache.list));
     pagination.total = streamInfoCache.list.length;
     loading.value = false;
+  };
+  const sortChange = args => {
+    let list;
+    if (args.order === "ascending") {
+      // 升序
+      list = streamInfo.list.sort((a, b) => {
+        return a[args.prop]?.localeCompare(b[args.prop]);
+      });
+    } else if (args.order === "descending") {
+      //   降序
+      list = streamInfo.list.sort((a, b) => {
+        return b[args.prop]?.localeCompare(a[args.prop]);
+      });
+    } else {
+      //默认按照创建时间排序
+      list = streamInfo.list.sort((a, b) => {
+        return b.createTime?.localeCompare(a.createTime);
+      });
+    }
+    streamInfo.list = JSON.parse(JSON.stringify(list));
   };
 
   function onTreeSelect() {
@@ -974,19 +985,18 @@ export function useUser(tableRef: Ref) {
     ws.onmessage = event => {
       const data = JSON.parse(event.data).data;
       let item = streamInfoCache.list.find(element => element.id === data.id);
-
       if (item) {
         item.runtime = data.runtime;
         item.playerCount = `${(item?.runtime ?? []).reduce((total, item) => {
           return total + (item?.playerCount ?? 0);
         }, 0)}`;
-        streamInfo.list = streamInfoCache.list;
+        streamInfo.list = JSON.parse(JSON.stringify(streamInfoCache.list));
       }
     };
   }
 
   onMounted(async () => {
-    treeLoading.value = true;
+    // treeLoading.value = true;
     fetchAll();
     connectWebSocket();
   });
@@ -998,6 +1008,7 @@ export function useUser(tableRef: Ref) {
     }
   });
   return {
+    sortChange,
     vendorImages,
     form,
     streamTypes,
@@ -1027,7 +1038,7 @@ export function useUser(tableRef: Ref) {
     onTreeSelect,
     handleUpdate,
     handleDelete,
-    handleUpload,
+    // handleUpload,
     handleReset,
     handleRole,
     onSelectionCancel,
