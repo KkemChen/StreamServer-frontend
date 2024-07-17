@@ -40,7 +40,6 @@ const {
   loading,
   columns,
   dataList,
-  streamInfo,
   // treeData,
   // treeLoading,
   selectedNum,

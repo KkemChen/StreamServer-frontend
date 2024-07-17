@@ -469,7 +469,7 @@ export function useUser(tableRef: Ref) {
       .sort((a, b) => {
         return b.createTime?.localeCompare(a.createTime);
       });
-    streamInfo.list = JSON.parse(JSON.stringify(streamInfoCache.list));
+    streamInfo.list = streamInfoCache.list;
     pagination.total = data.total;
     loading.value = false;
   }
@@ -494,7 +494,7 @@ export function useUser(tableRef: Ref) {
         matchesCriteria(info.vendor?.toString(), form.vendor) &&
         matchesCriteria(info.streamType?.toString(), form.streamType)
     );
-    streamInfo.list = JSON.parse(JSON.stringify(filteredList));
+    streamInfo.list = filteredList;
     pagination.total = filteredList.length;
     loading.value = false;
   }
@@ -506,7 +506,7 @@ export function useUser(tableRef: Ref) {
     // treeRef.value.onTreeReset();
     // fetchAll();
     // loading.value = true;
-    streamInfo.list = JSON.parse(JSON.stringify(streamInfoCache.list));
+    streamInfo.list = streamInfoCache.list;
     tableRef.value.getTableRef().clearSort();
     pagination.total = streamInfoCache.list.length;
     // loading.value = false;
@@ -991,7 +991,7 @@ export function useUser(tableRef: Ref) {
         item.playerCount = `${(item?.runtime ?? []).reduce((total, item) => {
           return total + (item?.playerCount ?? 0);
         }, 0)}`;
-        streamInfo.list = JSON.parse(JSON.stringify(streamInfoCache.list));
+        streamInfo.list = streamInfoCache.list;
       }
     };
   }
