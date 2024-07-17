@@ -127,7 +127,6 @@
 </template>
 
 <script setup>
-// import { useDark } from "@pureadmin/utils";
 import {
   dashboardInfo,
   dashboardData,
@@ -145,7 +144,6 @@ dayjs.extend(duration);
 import { message } from "@/utils/message";
 import { ref, onMounted, reactive, onUnmounted, computed } from "vue";
 
-// const { isDark } = useDark();
 //定时器id
 let timerId = undefined;
 let refreshId = undefined;
@@ -389,8 +387,8 @@ const loadDashboardData = async () => {
         let obj = (res.data.net ?? []).find(
           item => item.interface_name === v.interface_name
         );
-        v.rx.push(obj.rx_speed ?? 0);
-        v.tx.push(obj.tx_speed ?? 0);
+        v.rx.push(obj?.rx_speed ?? 0);
+        v.tx.push(obj?.tx_speed ?? 0);
       });
       // 主机信息
       data.host = res.data.host ?? {};
