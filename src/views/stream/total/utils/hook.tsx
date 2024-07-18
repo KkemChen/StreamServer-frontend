@@ -521,16 +521,17 @@ export function useUser(tableRef: Ref) {
       list = streamInfo.list.sort((a, b) => {
         return a[args.prop]?.localeCompare(b[args.prop]);
       });
+      streamInfo.list = list;
     } else if (args.order === "descending") {
       //   降序
       list = streamInfo.list.sort((a, b) => {
         return b[args.prop]?.localeCompare(a[args.prop]);
       });
+      streamInfo.list = list;
     } else {
-      //默认按照创建时间排序
-      list = JSON.parse(JSON.stringify(streamInfoCache.list));
+      //取消排序的时候
+      onSearch(form);
     }
-    streamInfo.list = list;
   };
 
   function onTreeSelect() {
