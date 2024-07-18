@@ -511,6 +511,7 @@ export function useUser(tableRef: Ref) {
     streamInfo.list = streamInfoCache.list;
     tableRef.value.getTableRef().clearSort();
     pagination.total = streamInfoCache.list.length;
+    onSearch(form);
     // loading.value = false;
   };
   const sortChange = args => {
@@ -527,11 +528,9 @@ export function useUser(tableRef: Ref) {
       });
     } else {
       //默认按照创建时间排序
-      list = streamInfo.list.sort((a, b) => {
-        return b.createTime?.localeCompare(a.createTime);
-      });
+      list = streamInfoCache.list;
     }
-    streamInfo.list = JSON.parse(JSON.stringify(list));
+    streamInfo.list = list;
   };
 
   function onTreeSelect() {
