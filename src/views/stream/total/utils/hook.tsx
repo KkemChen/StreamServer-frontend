@@ -472,6 +472,7 @@ export function useUser(tableRef: Ref) {
     streamInfo.list = streamInfoCache.list;
     pagination.total = data.total;
     loading.value = false;
+    cleanFormAndSort();
   }
 
   async function onSearch(form) {
@@ -746,6 +747,15 @@ export function useUser(tableRef: Ref) {
       }
     }
     return index;
+  }
+
+  function cleanFormAndSort() {
+    form.id = "";
+    form.ip = "";
+    form.name = "";
+    form.vendor = "";
+    form.streamType = "";
+    tableRef.value.getTableRef().clearSort();
   }
 
   function openDialog(title = "新增", row?: FormItemProps) {
