@@ -469,7 +469,7 @@ export function useUser(tableRef: Ref) {
       .sort((a, b) => {
         return b.createTime?.localeCompare(a.createTime);
       });
-    streamInfo.list = streamInfoCache.list;
+    streamInfo.list = JSON.parse(JSON.stringify(streamInfoCache.list));
     pagination.total = data.total;
     loading.value = false;
     cleanFormAndSort();
@@ -495,7 +495,7 @@ export function useUser(tableRef: Ref) {
         matchesCriteria(info.vendor?.toString(), form.vendor) &&
         matchesCriteria(info.streamType?.toString(), form.streamType)
     );
-    streamInfo.list = filteredList;
+    streamInfo.list = JSON.parse(JSON.stringify(filteredList));
     pagination.total = filteredList.length;
     loading.value = false;
     tableRef.value.getTableRef().clearSort();
@@ -508,7 +508,7 @@ export function useUser(tableRef: Ref) {
     // treeRef.value.onTreeReset();
     // fetchAll();
     // loading.value = true;
-    streamInfo.list = streamInfoCache.list;
+    streamInfo.list = JSON.parse(JSON.stringify(streamInfoCache.list));
     tableRef.value.getTableRef().clearSort();
     pagination.total = streamInfoCache.list.length;
     onSearch(form);
@@ -528,7 +528,7 @@ export function useUser(tableRef: Ref) {
       });
     } else {
       //默认按照创建时间排序
-      list = streamInfoCache.list;
+      list = JSON.parse(JSON.stringify(streamInfoCache.list));
     }
     streamInfo.list = list;
   };
@@ -996,9 +996,16 @@ export function useUser(tableRef: Ref) {
     ws.onmessage = event => {
       const data = JSON.parse(event.data).data;
       let item = streamInfoCache.list.find(element => element.id === data.id);
+      let item2 = streamInfo.list.find(element => element.id === data.id);
       if (item) {
         item.runtime = data.runtime;
         item.playerCount = `${(item?.runtime ?? []).reduce((total, item) => {
+          return total + (item?.playerCount ?? 0);
+        }, 0)}`;
+      }
+      if (item2) {
+        item2.runtime = data.runtime;
+        item2.playerCount = `${(item2?.runtime ?? []).reduce((total, item) => {
           return total + (item?.playerCount ?? 0);
         }, 0)}`;
       }
