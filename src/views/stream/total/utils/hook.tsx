@@ -496,6 +496,7 @@ export function useUser(tableRef: Ref) {
         matchesCriteria(info.streamType?.toString(), form.streamType)
     );
     streamInfo.list = JSON.parse(JSON.stringify(filteredList));
+    pagination.currentPage = 1;
     pagination.total = filteredList.length;
     loading.value = false;
     tableRef.value.getTableRef().clearSort();
