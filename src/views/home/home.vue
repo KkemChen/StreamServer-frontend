@@ -190,13 +190,6 @@ const runtime = computed(() => {
   // 年月日
   // return dayjs.duration(dur * 1000).format("Y年M月D天 H:m:s");
 });
-//线程数
-const threads = computed(() => {
-  return (
-    Number.parseInt(data.cpu["Core(s) per socket"]) *
-    Number.parseInt(data.cpu["Thread(s) per core"])
-  );
-});
 //硬盘统计数据
 const diskTotal = computed(() => {
   let total = {

@@ -1014,7 +1014,7 @@ export function useUser(tableRef: Ref) {
     };
   }
 
-  onMounted(async () => {
+  onMounted(() => {
     // treeLoading.value = true;
     fetchAll();
     connectWebSocket();

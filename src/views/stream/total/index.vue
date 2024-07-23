@@ -40,8 +40,8 @@ const {
   loading,
   columns,
   dataList,
-  // treeData,
-  // treeLoading,
+  treeData,
+  treeLoading,
   selectedNum,
   pagination,
   // buttonClass,
@@ -52,7 +52,7 @@ const {
   resetForm,
   onbatchDel,
   openDialog,
-  // onTreeSelect,
+  onTreeSelect,
   // handleUpdate,
   handleDelete,
   downloadTemplate,
@@ -180,13 +180,13 @@ const play = (id: String) => {
 
 <template>
   <div :class="['flex', 'justify-between', deviceDetection() && 'flex-wrap']">
-    <!-- <tree
-      ref="treeRef"
-      :class="['mr-2', deviceDetection() ? 'w-full' : 'min-w-[200px]']"
-      :treeData="treeData"
-      :treeLoading="treeLoading"
-      @tree-select="onTreeSelect"
-    /> -->
+    <!--    <tree-->
+    <!--      ref="treeRef"-->
+    <!--      :class="['mr-2', deviceDetection() ? 'w-full' : 'min-w-[200px]']"-->
+    <!--      :treeData="treeData"-->
+    <!--      :treeLoading="treeLoading"-->
+    <!--      @tree-select="onTreeSelect"-->
+    <!--    />-->
     <div :class="[deviceDetection() ? ['w-full', 'mt-2'] : 'w-[calc(100%)]']">
       <el-form
         ref="formRef"
